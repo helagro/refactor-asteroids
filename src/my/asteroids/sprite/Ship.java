@@ -3,18 +3,18 @@ package my.asteroids.sprite;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import my.asteroids.Asteroids;
+import my.asteroids.Game;
 import my.asteroids.sprite.thruster.FwdThruster;
 import my.asteroids.sprite.thruster.RevThruster;
 
 
 public class Ship extends SpriteObj{
 
-	static final double SHIP_ANGLE_STEP = Math.PI / Asteroids.FPS;
-	static final double SHIP_SPEED_STEP = 30.0 / Asteroids.FPS; //TODO: 15
+	static final double SHIP_ANGLE_STEP = Math.PI / Game.FPS;
+	static final double SHIP_SPEED_STEP = 30.0 / Game.FPS; //TODO: 15
 	static final double MAX_SHIP_SPEED = 1.25 * Asteroid.MAX_ROCK_SPEED;
     static final int FIRE_DELAY = 1; // Minimum number of milliseconds required between photon shots TODO: 50
-	public static final int HYPER_COUNT = 3 * Asteroids.FPS; // calculated using number of
+	public static final int HYPER_COUNT = 3 * Game.FPS; // calculated using number of
 	public static final int MAX_SHIPS = 3; // Starting number of ships for each game.
 
 

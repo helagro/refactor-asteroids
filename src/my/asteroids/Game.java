@@ -35,7 +35,7 @@ import my.asteroids.sprite.Missile;
 import my.asteroids.sprite.Photon;
 import my.asteroids.sprite.Ship;
 
-public class Asteroids extends Panel implements Runnable, KeyListener {
+public class Game extends Panel implements Runnable, KSCListener{
 	private static final long serialVersionUID = 1L;
 	// Copyright information.
 
@@ -87,12 +87,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	boolean playing;
 	boolean detail;
 
-	// Key flags.
-
-	boolean left = false;
-	boolean right = false;
-	boolean up = false;
-	boolean down = false;
 
 	// Sprite objects.
 
@@ -148,6 +142,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	// My stuff
 
 	Sound sound = Sound.getInstance();
+	KSController kController;
 
 
 	public String getAppletInfo() {
@@ -157,7 +152,10 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		return (copyText);
 	}
 
-	public static void main(String[] args) {
+
+	public Game(KSController kController){
+		this.kController = kController;
+
 		Frame f = new Frame();
 		f.addWindowListener(new java.awt.event.WindowAdapter() {
 			public void windowClosing(java.awt.event.WindowEvent e) {
@@ -165,17 +163,15 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			};
 		});
 
-		Asteroids ut = new Asteroids();
-		ut.setSize(700, 400);
-		f.add(ut);
+		setSize(700, 400);
+		f.add(this);
 		f.pack();
-		ut.init();
+		init();
 		f.setSize(700, 400 + 20); // add 20, seems enough for the Frame title,
 		f.show();
-		ut.start();
 	}
 
-	public void init() {
+	private void init() {
 
 		Dimension d = new Dimension(700, 400);
 		int i;
@@ -186,7 +182,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		// Set up key event handling and set focus to applet window.
 
-		addKeyListener(this);
 		requestFocus();
 
 		// Save the screen size.
@@ -362,11 +357,11 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		if (!playing)
 			return;
 
-		if (left) ship.rotateLeft();
-		if (right) ship.rotateRight();
+		if (kController.isLeft()) ship.rotateLeft();
+		if (kController.isRight()) ship.rotateRight();
 
-		if (up) ship.moveForward();
-		if (down) ship.moveBackward();
+		if (kController.isUp()) ship.moveForward();
+		if (kController.isDown()) ship.moveBackward();
 
 		// Move the ship. If it is currently in hyperspace, advance the countdown.
 
@@ -563,92 +558,58 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			}
 	}
 
-	public void keyPressed(KeyEvent e) {
-		// Check if any cursor keys have been pressed and set flags.
-
-		if (e.getKeyCode() == KeyEvent.VK_LEFT)
-			left = true;
-		if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-			right = true;
-		if (e.getKeyCode() == KeyEvent.VK_UP)
-			up = true;
-		if (e.getKeyCode() == KeyEvent.VK_DOWN)
-			down = true;
-
-		if ((up || down) && ship.active && !thrustersPlaying) {
+	@Override
+	public void onArrowKeyDown() {
+		if (kController.hasVertical() && ship.active && !thrustersPlaying) {
 			sound.play(sound.getThrustersSound(), Clip.LOOP_CONTINUOUSLY);
 			thrustersPlaying = true;
 		}
-
-		// Spacebar: fire a photon and start its counter.
-
-		if (e.getKeyChar() == ' ' && ship.active) {
-			sound.play(sound.getFireSound(), 1);
-
-			photonTime = System.currentTimeMillis();
-			photonIndex++;
-			if (photonIndex >= Photon.MAX_SHOTS)
-				photonIndex = 0;
-
-			photons[photonIndex].launch(ship);
-		}
-
-		// Allow upper or lower case characters for remaining keys.
-
-		char c = Character.toLowerCase(e.getKeyChar());
-
-		// 'H' key: warp ship into hyperspace by moving to a random location and
-		// starting counter.
-		if (c == 'h' && ship.active && !ship.isHyperSpace()) {
-			ship.teleportRandom();
-			ship.enterHyperSpace();
-
-			sound.play(sound.getWarpSound(), 1);
-		}
-
-		// 'P' key: toggle pause mode and start or stop any active looping sound clips.
-		if (c == 'p') {
-			sound.toggleMute(false);
-			if(!sound.isMuted()){
-				resumeLooping();
-			}
-
-			paused = !paused;
-		}
-
-		// 'M' key: toggle sound on or off and stop any looping sound clips.
-		if (c == 'm') {
-			sound.toggleMute(true);
-
-			if(!sound.isMuted()){
-				resumeLooping();
-			}
-		}
-
-		// 'D' key: toggle graphics detail on or off.
-		if (c == 'd')
-			detail = !detail;
-
-		// 'S' key: start the game, if not already in progress.
-		if (c == 's' && sound.isLoaded() && !playing)
-			initGame();
-
 	}
 
-	public void keyReleased(KeyEvent e) {
 
-		if (e.getKeyCode() == KeyEvent.VK_LEFT)
-			left = false;
-		if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-			right = false;
-		if (e.getKeyCode() == KeyEvent.VK_UP)
-			up = false;
-		if (e.getKeyCode() == KeyEvent.VK_DOWN)
-			down = false;
-
-		if (!up && !down && thrustersPlaying) {
+	@Override
+	public void onArrowKeyUp() {
+		if (!kController.hasVertical() && thrustersPlaying) {
 			sound.getThrustersSound().stop();
 			thrustersPlaying = false;
+		}
+	}
+
+
+	@Override
+	public void onChar(char character) {
+		switch (character){
+			case ' ':
+				if(ship.active){
+					sound.play(sound.getFireSound(), 1);
+					photonTime = System.currentTimeMillis();
+					photonIndex = (photonIndex +1) % Photon.MAX_SHOTS;
+					photons[photonIndex].launch(ship);
+				}
+				break;
+			case 'h': //Hyperspace
+				if(ship.active && !ship.isHyperSpace()){
+					ship.teleportRandom();
+					ship.enterHyperSpace();
+		
+					sound.play(sound.getWarpSound(), 1);
+				}
+				break;
+			case 'p': //Pause
+				sound.toggleMute(false);
+				if(!sound.isMuted()) resumeLooping();
+				paused = !paused;
+				break;
+			case 'm': //Mute
+				sound.toggleMute(true);
+				if(!sound.isMuted()) resumeLooping();
+				break;
+			case 'd': //graphic Details
+				detail = !detail;
+				break;
+			case 's': // Start
+				if(sound.isLoaded() && !playing) initGame();
+				break;
 		}
 	}
 
@@ -661,8 +622,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			sound.play(sound.getThrustersSound(), Clip.LOOP_CONTINUOUSLY);
 	}
 
-	public void keyTyped(KeyEvent e) {
-	}
 
 	public void update(Graphics g) {
 		paint(g);
@@ -707,8 +666,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		ship.draw(offGraphics, detail);
 
 		if(!paused){
-			if(up) ship.drawFwdThruster(offGraphics, detail);
-			if(down) ship.drawRevThruster(offGraphics, detail);
+			if(kController.isUp()) ship.drawFwdThruster(offGraphics, detail);
+			if(kController.isDown()) ship.drawRevThruster(offGraphics, detail);
 		}
 
 
@@ -773,4 +732,5 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		g.drawImage(offImage, 0, 0, this);
 	}
+
 }

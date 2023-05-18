@@ -5,7 +5,7 @@ import java.awt.Graphics;
 
 import javax.sound.sampled.Clip;
 
-import my.asteroids.Asteroids;
+import my.asteroids.Game;
 import my.asteroids.Sound;
 
 public class FlyingSaucer extends SpriteObj{
@@ -13,7 +13,7 @@ public class FlyingSaucer extends SpriteObj{
 	public static final int NEW_UFO_POINTS = 600; //TODO : 2570
 	public static final int POINTS = 250;
     static final int PASSES = 3; // Number of passes for flying saucer per appearance.
-	static final double Missile_PROBABILITY = 0.45 / Asteroids.FPS;
+	static final double Missile_PROBABILITY = 0.45 / Game.FPS;
 
 	private int ufoCounter; // Timer counter used to track each flying saucer pass.
 	private int passesLeft; // Counter for number of flying saucer passes.
@@ -82,7 +82,7 @@ public class FlyingSaucer extends SpriteObj{
 
     private boolean shouldFireMissile(Ship ship, Missile missile){
         int d = (int) Math.max(Math.abs(x - ship.x), Math.abs(y - ship.y));
-        boolean goodShipDistance = d > Asteroid.MAX_ROCK_SPEED * Asteroids.FPS / 2;
+        boolean goodShipDistance = d > Asteroid.MAX_ROCK_SPEED * Game.FPS / 2;
         boolean canFireRandom = Math.random() < Missile_PROBABILITY;
 
         return (

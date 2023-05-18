@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
-import my.asteroids.Asteroids;
+import my.asteroids.Game;
 
 public class Asteroid extends SpriteObj{
 
@@ -13,9 +13,9 @@ public class Asteroid extends SpriteObj{
 	public static final int MIN_ROCK_SIZE = 20;
 	public static final int MAX_ROCK_SIZE = 40;
 	public static final int MAX_ROCKS = 8;
-	public static final double MIN_ROCK_SPEED = 40.0 / Asteroids.FPS;
-	public static final double MAX_ROCK_SPEED = 240.0 / Asteroids.FPS;
-	public static final double MAX_ROCK_SPIN = Math.PI / Asteroids.FPS;
+	public static final double MIN_ROCK_SPEED = 40.0 / Game.FPS;
+	public static final double MAX_ROCK_SPEED = 240.0 / Game.FPS;
+	public static final double MAX_ROCK_SPIN = Math.PI / Game.FPS;
 
 
     private boolean isSmall;
