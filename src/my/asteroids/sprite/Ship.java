@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import my.asteroids.Asteroids;
+import my.asteroids.sprite.thruster.FwdThruster;
+import my.asteroids.sprite.thruster.RevThruster;
 
 
 public class Ship extends AsteroidsSprite{
@@ -11,10 +13,13 @@ public class Ship extends AsteroidsSprite{
 	static final double SHIP_ANGLE_STEP = Math.PI / Asteroids.FPS;
 	static final double SHIP_SPEED_STEP = 15.0 / Asteroids.FPS;
 	static final double MAX_SHIP_SPEED = 1.25 * Asteroid.MAX_ROCK_SPEED;
+	public static final int HYPER_COUNT = 3 * Asteroids.FPS; // calculated using number of
 
 
-    FwdThruster fwdThruster;
-	RevThruster revThruster;
+    private FwdThruster fwdThruster;
+	private RevThruster revThruster;
+	private int hyperCounter; // Timer counter for hyperspace. 
+
 
 
     public Ship(){
@@ -28,7 +33,7 @@ public class Ship extends AsteroidsSprite{
 
 
 	// Reset the ship sprite at the center of the screen.
-    public void init(){
+    public void init(boolean firstTime){
         active = true;
 		angle = 0.0;
 		deltaAngle = 0.0;
@@ -37,6 +42,7 @@ public class Ship extends AsteroidsSprite{
 		deltaX = 0.0;
 		deltaY = 0.0;
 
+        hyperCounter = firstTime ? 0 : HYPER_COUNT;
         positionThrusters();
 
 		render();
@@ -46,6 +52,9 @@ public class Ship extends AsteroidsSprite{
     public boolean advance() {
         positionThrusters();
 
+        if (isHyperSpace())
+            hyperCounter--;
+
         return super.advance();
     }
 
@@ -53,6 +62,21 @@ public class Ship extends AsteroidsSprite{
     private void positionThrusters(){
         revThruster.position(this);
         fwdThruster.position(this);
+    }
+
+
+    // ======== HYPER SPACE ==========
+
+    public boolean isHyperSpace(){
+        return hyperCounter > 0;
+    }
+
+    public void enterHyperSpace(){
+        hyperCounter = HYPER_COUNT;
+    }
+
+    public int getHyperSpaceCounter(){
+        return hyperCounter;
     }
 
 

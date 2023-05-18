@@ -1,4 +1,4 @@
-package my.asteroids.sprite;
+package my.asteroids.sprite.thruster;
 
 import java.awt.Graphics;
 
@@ -13,7 +13,7 @@ public class FwdThruster extends Thruster{
     }
 
 
-    void run(Graphics offGraphics){
+    public void run(Graphics offGraphics){
         offGraphics.drawPolygon(sprite);
         offGraphics.drawLine(sprite.xpoints[sprite.npoints - 1],
                 sprite.ypoints[sprite.npoints - 1], sprite.xpoints[0],

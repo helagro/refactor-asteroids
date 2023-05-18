@@ -17,6 +17,8 @@ public class Sound {
 
 	private int clipTotal = 0;
 	private int clipsLoaded = 0;
+    private boolean isLoaded = false;
+    private boolean isMuted = false;
 
     // Sound clips.
 
@@ -27,6 +29,21 @@ public class Sound {
 	private Clip saucerSound;
 	private Clip thrustersSound;
 	private Clip warpSound;
+
+
+
+    // ========= SINGLETON =========
+
+    private static Sound instance;
+
+    public static Sound getInstance(){
+        if(instance == null) 
+            instance = new Sound();
+        return instance;
+    }
+
+    private Sound(){
+    }
 
 
     // ========= LOAD ==========
@@ -40,6 +57,8 @@ public class Sound {
         saucerSound = loadSound("saucer.wav", onSoundLoaded);
         thrustersSound = loadSound("thrusters.wav", onSoundLoaded);
         warpSound = loadSound("warp.wav", onSoundLoaded);
+
+        isLoaded = true;
 	}
 
     private Clip loadSound(String fileName, Runnable onSoundLoaded){
@@ -87,6 +106,14 @@ public class Sound {
         return clipsLoaded;
     }
 
+    public boolean isLoaded(){
+        return isLoaded;
+    }
+
+    public boolean isMuted(){
+        return isMuted;
+    }
+
     
 
     public Clip getCrashSound() {
@@ -120,9 +147,11 @@ public class Sound {
 
 
 
-    // ============ OTHER ==========
+    // ========= PLAY / PAUSE =========
 
     public void stopAll(){
+        if(!isLoaded) return;
+
         crashSound.stop();
         explosionSound.stop();
         fireSound.stop();
@@ -133,9 +162,36 @@ public class Sound {
     }
 
     public void stopLooping(){
+        if(!isLoaded) return;
+
         missileSound.stop();
         saucerSound.stop();
         thrustersSound.stop();
+    }
+
+    public void play(Clip clip, int loopOpt){
+        if(isLoaded && !isMuted)
+            clip.loop(loopOpt);
+    }
+
+    public void stop(Clip clip){
+        if(isLoaded)
+            clip.stop();
+    }
+
+
+
+    // ============ OTHER ==========
+
+    public void toggleMute(boolean stopAll){
+        isMuted = !isMuted;
+
+        if(isMuted){
+            if(stopAll)
+                stopAll();
+            else
+                stopLooping();
+        }
     }
 
 }

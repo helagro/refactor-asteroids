@@ -1,4 +1,7 @@
-package my.asteroids.sprite;
+package my.asteroids.sprite.thruster;
+
+import my.asteroids.sprite.AsteroidsSprite;
+import my.asteroids.sprite.Ship;
 
 public class Thruster extends AsteroidsSprite{
     public void position(Ship ship){
