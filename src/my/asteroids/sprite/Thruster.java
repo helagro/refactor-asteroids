@@ -1,7 +1,7 @@
 package my.asteroids.sprite;
 
 public class Thruster extends AsteroidsSprite{
-    public void init(Ship ship){
+    public void position(Ship ship){
         x = ship.x;
 		y = ship.y;
 		angle = ship.angle;

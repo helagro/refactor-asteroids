@@ -1,5 +1,8 @@
 package my.asteroids.sprite;
 
+import java.awt.Graphics;
+
+
 public class FwdThruster extends Thruster{
     @Override
     public void render() {
@@ -9,5 +12,12 @@ public class FwdThruster extends Thruster{
 		shape.addPoint(3, 16);
 
         super.render();
+    }
+
+    void run(Graphics offGraphics){
+        offGraphics.drawPolygon(sprite);
+        offGraphics.drawLine(sprite.xpoints[sprite.npoints - 1],
+                sprite.ypoints[sprite.npoints - 1], sprite.xpoints[0],
+                sprite.ypoints[0]);
     }
 }

@@ -37,8 +37,6 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import my.asteroids.sprite.AsteroidsSprite;
-import my.asteroids.sprite.FwdThruster;
-import my.asteroids.sprite.RevThruster;
 import my.asteroids.sprite.Ship;
 import my.asteroids.Sound;
 
@@ -140,8 +138,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	// Sprite objects.
 
 	Ship ship;
-	FwdThruster fwdThruster;
-	RevThruster revThruster;
+
 	AsteroidsSprite ufo;
 	AsteroidsSprite missile;
 	AsteroidsSprite[] photons = new AsteroidsSprite[MAX_SHOTS];
@@ -262,8 +259,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 
 		ship = new Ship();
-		fwdThruster = new FwdThruster();
-		revThruster = new RevThruster();
 
 
 		// Create shape for each photon sprites.
@@ -455,12 +450,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 
 	public void initShip() {
-
 		ship.init();
-
-		// Initialize thruster sprites.
-		fwdThruster.init(ship);
-		revThruster.init(ship);
 
 		if (loaded)
 			sound.getThrustersSound().stop();
@@ -529,14 +519,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 			// Update the thruster sprites to match the ship sprite.
 
-			fwdThruster.x = ship.x;
-			fwdThruster.y = ship.y;
-			fwdThruster.angle = ship.angle;
-			fwdThruster.render();
-			revThruster.x = ship.x;
-			revThruster.y = ship.y;
-			revThruster.angle = ship.angle;
-			revThruster.render();
+			ship.positionThrusters();
 		}
 
 		// Ship is exploding, advance the countdown or create a new ship if it is
@@ -1186,18 +1169,11 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			// flicker effect.
 
 			if (!paused && detail && Math.random() < 0.5) {
-				if (up) {
-					offGraphics.drawPolygon(fwdThruster.sprite);
-					offGraphics.drawLine(fwdThruster.sprite.xpoints[fwdThruster.sprite.npoints - 1],
-							fwdThruster.sprite.ypoints[fwdThruster.sprite.npoints - 1], fwdThruster.sprite.xpoints[0],
-							fwdThruster.sprite.ypoints[0]);
-				}
-				if (down) {
-					offGraphics.drawPolygon(revThruster.sprite);
-					offGraphics.drawLine(revThruster.sprite.xpoints[revThruster.sprite.npoints - 1],
-							revThruster.sprite.ypoints[revThruster.sprite.npoints - 1], revThruster.sprite.xpoints[0],
-							revThruster.sprite.ypoints[0]);
-				}
+				if (up) 
+					ship.runFwdThrustor(offGraphics);
+					
+				if (down) 
+					ship.runRwdThrustor(offGraphics);
 			}
 		}
 
