@@ -15,7 +15,11 @@ public class Asteroid extends AsteroidsSprite{
 	public static final double MAX_ROCK_SPIN = Math.PI / Asteroids.FPS;
 
 
+    private boolean isSmall;
 
+    public boolean isSmall(){
+        return isSmall;
+    }
 
 
     public void init(double asteroidsSpeed){
@@ -59,6 +63,7 @@ public class Asteroid extends AsteroidsSprite{
         if (Math.random() < 0.5)
             deltaY = -deltaY;
 
+        isSmall = false;
         render();
     }
 
@@ -80,6 +85,8 @@ public class Asteroid extends AsteroidsSprite{
         this.y = y;
         deltaX = Math.random() * 2 * asteroidsSpeed - asteroidsSpeed;
         deltaY = Math.random() * 2 * asteroidsSpeed - asteroidsSpeed;
+
+        isSmall = true;
         render();
     }
 }

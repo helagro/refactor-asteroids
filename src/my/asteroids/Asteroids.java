@@ -148,7 +148,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 	// Asteroid data.
 
-	boolean[] asteroidIsSmall = new boolean[MAX_ROCKS]; // Asteroid size flag.
 	int asteroidsCounter; // Break-time counter.
 	double asteroidsSpeed; // Asteroid speed.
 	int asteroidsLeft; // Number of active asteroids.
@@ -682,7 +681,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		for (int i = 0; i < MAX_ROCKS; i++){
 			asteroids[i].init(asteroidsSpeed);
-			asteroidIsSmall[i] = false;
 		}
 
 		asteroidsCounter = STORM_PAUSE;
@@ -713,7 +711,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			if (!asteroids[i].active) {
 				asteroids[i].shrink(tempX, tempY, asteroidsSpeed);
 
-				asteroidIsSmall[i] = true;
 				count++;
 				asteroidsLeft++;
 			}
@@ -743,7 +740,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 						if (doSound)
 							sound.getExplosionSound().loop(1);
 						explode(asteroids[i]);
-						if (!asteroidIsSmall[i]) {
+						if (!asteroids[i].isSmall()) {
 							score += BIG_POINTS;
 							initSmallAsteroids(i);
 						} else
