@@ -2,11 +2,16 @@ package my.asteroids.sprite;
 
 import java.awt.Graphics;
 
+import my.asteroids.Asteroids;
+
 
 public class Ship extends AsteroidsSprite{
 
+	static final double SHIP_ANGLE_STEP = Math.PI / Asteroids.FPS;
+
     FwdThruster fwdThruster;
 	RevThruster revThruster;
+
 
     public Ship(){
         fwdThruster = new FwdThruster();
@@ -43,6 +48,19 @@ public class Ship extends AsteroidsSprite{
 		shape.addPoint(-7, 10);
 
         super.render();
+    }
+
+
+    public void rotateLeft(){
+        angle += SHIP_ANGLE_STEP;
+        if (angle > 2 * Math.PI)
+            angle -= 2 * Math.PI;
+    }
+
+    public void rotateRight(){
+        angle -= SHIP_ANGLE_STEP;
+        if (angle < 0)
+            angle += 2 * Math.PI;
     }
 
 

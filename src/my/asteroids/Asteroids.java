@@ -27,18 +27,8 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
-
 import my.asteroids.sprite.AsteroidsSprite;
 import my.asteroids.sprite.Ship;
-import my.asteroids.Sound;
 
 public class Asteroids extends Panel implements Runnable, KeyListener {
 	private static final long serialVersionUID = 1L;
@@ -58,7 +48,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	// Constants
 
 	static final int DELAY = 20; // Milliseconds between screen and
-	static final int FPS = // the resulting frame rate.
+	public static final int FPS = // the resulting frame rate.
 			Math.round(1000 / DELAY);
 
 	static final int MAX_SHOTS = 8; // Maximum number of sprites
@@ -85,7 +75,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 	// Ship's rotation and acceleration rates and maximum speed.
 
-	static final double SHIP_ANGLE_STEP = Math.PI / FPS;
 	static final double SHIP_SPEED_STEP = 15.0 / FPS;
 	static final double MAX_SHIP_SPEED = 1.25 * MAX_ROCK_SPEED;
 
@@ -468,14 +457,10 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		// Rotate the ship if left or right cursor key is down.
 
 		if (left) {
-			ship.angle += SHIP_ANGLE_STEP;
-			if (ship.angle > 2 * Math.PI)
-				ship.angle -= 2 * Math.PI;
+			ship.rotateLeft();
 		}
 		if (right) {
-			ship.angle -= SHIP_ANGLE_STEP;
-			if (ship.angle < 0)
-				ship.angle += 2 * Math.PI;
+			ship.rotateRight();
 		}
 
 		// Fire thrusters if up or down cursor key is down.
@@ -1171,7 +1156,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			if (!paused && detail && Math.random() < 0.5) {
 				if (up) 
 					ship.runFwdThrustor(offGraphics);
-					
+
 				if (down) 
 					ship.runRwdThrustor(offGraphics);
 			}
