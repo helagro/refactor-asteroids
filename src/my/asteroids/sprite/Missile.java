@@ -1,11 +1,13 @@
 package my.asteroids.sprite;
 
+import java.awt.Graphics;
+
 import javax.sound.sampled.Clip;
 
 import my.asteroids.Asteroids;
 import my.asteroids.Sound;
 
-public class Missile extends AsteroidsSprite{
+public class Missile extends SpriteObj{
 
 	static final int Missile_COUNT = 4 * Asteroids.FPS; // seconds x frames per second.
 	private int missileCounter; // Counter for life of 
@@ -97,4 +99,12 @@ public class Missile extends AsteroidsSprite{
     public int getMissileCounter(){
         return missileCounter;
     }
+
+	@Override
+	protected void onDraw(Graphics offGraphics, boolean detailed) {
+		offGraphics.drawPolygon(sprite);
+		offGraphics.drawLine(sprite.xpoints[sprite.npoints - 1],
+		sprite.ypoints[sprite.npoints - 1], sprite.xpoints[0],
+		sprite.ypoints[0]);
+	}
 }

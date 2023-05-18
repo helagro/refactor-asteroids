@@ -16,7 +16,8 @@ public class RevThruster extends Thruster{
     }
 
 
-    public void run(Graphics offGraphics){
+    @Override
+    protected void onDraw(Graphics offGraphics, boolean detailed){
         offGraphics.drawPolygon(sprite);
         offGraphics.drawLine(sprite.xpoints[sprite.npoints - 1],
                 sprite.ypoints[sprite.npoints - 1], sprite.xpoints[0],

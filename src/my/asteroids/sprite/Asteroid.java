@@ -6,7 +6,7 @@ import java.awt.Polygon;
 
 import my.asteroids.Asteroids;
 
-public class Asteroid extends AsteroidsSprite{
+public class Asteroid extends SpriteObj{
 
     public static final int MIN_ROCK_SIDES = 6; // Ranges for asteroid shape, size
 	public static final int MAX_ROCK_SIDES = 16; // speed and rotation.
@@ -43,15 +43,15 @@ public class Asteroid extends AsteroidsSprite{
         // Place the asteroid at one edge of the screen.
 
         if (Math.random() < 0.5) {
-            x = -AsteroidsSprite.width / 2;
+            x = -SpriteObj.width / 2;
             if (Math.random() < 0.5)
-                x = AsteroidsSprite.width / 2;
-            y = Math.random() * AsteroidsSprite.height;
+                x = SpriteObj.width / 2;
+            y = Math.random() * SpriteObj.height;
         } else {
-            x = Math.random() * AsteroidsSprite.width;
-            y = -AsteroidsSprite.height / 2;
+            x = Math.random() * SpriteObj.width;
+            y = -SpriteObj.height / 2;
             if (Math.random() < 0.5)
-                y = AsteroidsSprite.height / 2;
+                y = SpriteObj.height / 2;
         }
 
         // Set a random motion for the asteroid.
@@ -91,11 +91,13 @@ public class Asteroid extends AsteroidsSprite{
     }
 
 
-    public void draw(boolean detail, Graphics offGraphics){
-        if (detail) {
+    @Override
+    protected void onDraw(Graphics offGraphics, boolean detailed){
+        if(detailed){
             offGraphics.setColor(Color.black);
             offGraphics.fillPolygon(sprite);
         }
+
         offGraphics.setColor(Color.white);
         offGraphics.drawPolygon(sprite);
         offGraphics.drawLine(sprite.xpoints[sprite.npoints - 1],

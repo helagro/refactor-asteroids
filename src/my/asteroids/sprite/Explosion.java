@@ -1,14 +1,15 @@
 package my.asteroids.sprite;
 
+import java.awt.Graphics;
 import java.awt.Polygon;
 
-public class Explosion extends AsteroidsSprite{
+public class Explosion extends SpriteObj{
     public void init(){
         shape = new Polygon();
         active = false;
     }
 
-    public void explode(AsteroidsSprite s, int i, int j){
+    public void explode(SpriteObj s, int i, int j){
         active = true;
         shape = new Polygon();
 
@@ -23,5 +24,14 @@ public class Explosion extends AsteroidsSprite{
         deltaAngle = 4 * (Math.random() * 2 * Asteroid.MAX_ROCK_SPIN - Asteroid.MAX_ROCK_SPIN);
         deltaX = (Math.random() * 2 * Asteroid.MAX_ROCK_SPEED - Asteroid.MAX_ROCK_SPEED + s.deltaX) / 2;
         deltaY = (Math.random() * 2 * Asteroid.MAX_ROCK_SPEED - Asteroid.MAX_ROCK_SPEED + s.deltaY) / 2;
+    }
+
+    @Override
+    protected void onDraw(Graphics offGraphics, boolean detailed) {
+        offGraphics.drawPolygon(sprite);
+        offGraphics.drawLine(sprite.xpoints[sprite.npoints - 1],
+            sprite.ypoints[sprite.npoints - 1], sprite.xpoints[0],
+            sprite.ypoints[0]
+        );
     }
 }

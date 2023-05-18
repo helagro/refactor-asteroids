@@ -28,7 +28,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import my.asteroids.sprite.Asteroid;
-import my.asteroids.sprite.AsteroidsSprite;
+import my.asteroids.sprite.SpriteObj;
 import my.asteroids.sprite.Explosion;
 import my.asteroids.sprite.FlyingSaucer;
 import my.asteroids.sprite.Missile;
@@ -56,25 +56,11 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	public static final int FPS = // the resulting frame rate.
 			Math.round(1000 / DELAY);
 
-	static final int MAX_SHOTS = 80; // Maximum number of sprites TODO: 8
 	static final int MAX_ROCKS = 8; // for photons, asteroids and
 	static final int MAX_SCRAP = 40; // explosions.
 
 	static final int SCRAP_COUNT = 2 * FPS; // Timer counter starting values
 	static final int STORM_PAUSE = 2 * FPS;
-
-
-	static final int MAX_SHIPS = 3; // Starting number of ships for
-									// each game.
-
-
-	// Ship's rotation and acceleration rates and maximum speed.
-
-	static final int FIRE_DELAY = 10; // Minimum number of milliseconds TODO: 50
-										// required between photon shots.
-
-	// Probablility of flying saucer firing a missile during any given frame
-	// (other conditions must be met).
 
 
 	static final int BIG_POINTS = 25; // Points scored for shooting
@@ -85,8 +71,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	// flying saucer to appear.
 
 	static final int NEW_SHIP_POINTS = 5000;
-	static final int NEW_UFO_POINTS = 275; //TODO : 2570
-
 	// Background stars.
 
 	int numStars;
@@ -101,7 +85,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 	// Flags for game state and options.
 
-	boolean loaded = false;
 	boolean paused;
 	boolean playing;
 	boolean detail;
@@ -119,7 +102,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	Missile missile;
 
 	FlyingSaucer ufo;
-	Photon[] photons = new Photon[MAX_SHOTS];
+	Photon[] photons = new Photon[Photon.MAX_SHOTS];
 	Asteroid[] asteroids = new Asteroid[MAX_ROCKS];
 	Explosion[] explosions = new Explosion[MAX_SCRAP];
 
@@ -211,23 +194,23 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		// Save the screen size.
 
-		AsteroidsSprite.width = d.width;
-		AsteroidsSprite.height = d.height;
+		SpriteObj.width = d.width;
+		SpriteObj.height = d.height;
 
 		// Generate the starry background.
 
-		numStars = AsteroidsSprite.width * AsteroidsSprite.height / 5000;
+		numStars = SpriteObj.width * SpriteObj.height / 5000;
 		stars = new Point[numStars];
 		for (i = 0; i < numStars; i++)
-			stars[i] = new Point((int) (Math.random() * AsteroidsSprite.width),
-					(int) (Math.random() * AsteroidsSprite.height));
+			stars[i] = new Point((int) (Math.random() * SpriteObj.width),
+					(int) (Math.random() * SpriteObj.height));
 
 
 
 		ship = new Ship();
 		missile = new Missile();
 
-		for (i = 0; i < MAX_SHOTS; i++)
+		for (i = 0; i < Photon.MAX_SHOTS; i++)
 			photons[i] = new Photon();
 		
 		ufo = new FlyingSaucer();
@@ -252,10 +235,10 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		// Initialize game data and sprites.
 
 		score = 0;
-		shipsLeft = MAX_SHIPS;
+		shipsLeft = Ship.MAX_SHIPS;
 		asteroidsSpeed = Asteroid.MIN_ROCK_SPEED;
 		newShipScore = NEW_SHIP_POINTS;
-		newUfoScore = NEW_UFO_POINTS;
+		newUfoScore = FlyingSaucer.NEW_UFO_POINTS;
 		initShip(true);
 		initPhotons();
 
@@ -285,12 +268,11 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			loopThread = new Thread(this);
 			loopThread.start();
 		}
-		if (!loaded && loadThread == null) {
+		if (!sound.isLoaded() && loadThread == null) {
 			loadThread = new Thread(() -> {
 				sound.load(()->{
 					onSoundLoaded();
 				});
-				loaded = true;
 			});
 			loadThread.start();
 		}
@@ -339,7 +321,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 					shipsLeft++;
 				}
 				if (playing && score > newUfoScore && !ufo.active) {
-					newUfoScore += NEW_UFO_POINTS;
+					newUfoScore += FlyingSaucer.NEW_UFO_POINTS;
 					ufo.init();
 				}
 
@@ -375,8 +357,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	public void initShip(boolean firstTime) {
 		ship.init(firstTime);
 
-		if (loaded)
-			sound.getThrustersSound().stop();
+		sound.stop(sound.getThrustersSound());
 		thrustersPlaying = false;
 	}
 
@@ -414,15 +395,14 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		shipCounter = SCRAP_COUNT;
 		if (shipsLeft > 0)
 			shipsLeft--;
-		if (loaded)
-			sound.getThrustersSound().stop();
+		sound.stop(sound.getThrustersSound());
 		thrustersPlaying = false;
 	}
 
 	public void initPhotons() {
 		int i;
 
-		for (i = 0; i < MAX_SHOTS; i++)
+		for (i = 0; i < Photon.MAX_SHOTS; i++)
 			photons[i].active = false;
 		photonIndex = 0;
 	}
@@ -433,7 +413,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		// Move any active photons. Stop it when its counter has expired.
 
-		for (i = 0; i < MAX_SHOTS; i++)
+		for (i = 0; i < Photon.MAX_SHOTS; i++)
 			if (photons[i].active) {
 				if (!photons[i].advance())
 					photons[i].render();
@@ -447,27 +427,16 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		// Move the flying saucer and check for collision with a photon. Stop it
 		// when its counter has expired.
 
-		for (int i = 0; i < MAX_SHOTS; i++){
-			if (photons[i].active && ufo.isColliding(photons[i])) {
-				sound.play(sound.getCrashSound(), 1);
-				explode(ufo);
-				ufo.stop();
-				score += FlyingSaucer.POINTS;
-			}
+		boolean collided = Photon.handleCollision(photons, ufo);
+		if(collided){
+			explode(ufo);
+			ufo.stop();
+			score += FlyingSaucer.POINTS;
 		}
 
+		if (ufo.active)
+			ufo.update(ship, missile);
 
-		if (!ufo.active)
-			return;
-
-		ufo.update();
-
-		boolean notHyperSpace = !ship.isHyperSpace();
-		boolean shouldFireMissile = ufo.shouldFireMissile(ship, notHyperSpace, missile);
-
-		if(shouldFireMissile){
-			ufo.fireMissile(missile);
-		}
 	}
 
 	public void updateMissile() {
@@ -487,7 +456,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			missile.stop();
 		}
 
-		for (int i = 0; i < MAX_SHOTS; i++)
+		for (int i = 0; i < Photon.MAX_SHOTS; i++)
 			if (photons[i].active && missile.isColliding(photons[i])) {
 				sound.play(sound.getCrashSound(), 1);
 				explode(missile);
@@ -538,7 +507,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		// Move any active asteroids and check for collisions.
 
-		for (i = 0; i < MAX_ROCKS; i++)
+		for (i = 0; i < MAX_ROCKS; i++){
 			if (asteroids[i].active) {
 				asteroids[i].advance();
 				asteroids[i].render();
@@ -546,19 +515,19 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 				// If hit by photon, kill asteroid and advance score. If asteroid is
 				// large, make some smaller ones to replace it.
 
-				for (j = 0; j < MAX_SHOTS; j++)
-					if (photons[j].active && asteroids[i].active && asteroids[i].isColliding(photons[j])) {
-						asteroidsLeft--;
-						asteroids[i].active = false;
-						photons[j].active = false;
-						sound.play(sound.getExplosionSound(), 1);
-						explode(asteroids[i]);
-						if (!asteroids[i].isSmall()) {
-							score += BIG_POINTS;
-							initSmallAsteroids(i);
-						} else
-							score += SMALL_POINTS;
+				boolean isColliding = Photon.handleCollision(photons, asteroids[i]);
+				if(isColliding){
+					asteroidsLeft--;
+					explode(asteroids[i]);
+
+					if (!asteroids[i].isSmall()) {
+						score += BIG_POINTS;
+						initSmallAsteroids(i);
+					} else {
+						score += SMALL_POINTS;
 					}
+				}
+
 
 				// If the ship is not in hyperspace, see if it is hit.
 
@@ -571,10 +540,10 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 				// 	stopMissile();
 				// }
 			}
+		}
 	}
 
 	public void initExplosions() {
-
 		int i;
 
 		for (i = 0; i < MAX_SCRAP; i++) {
@@ -584,12 +553,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		explosionIndex = 0;
 	}
 
-	public void explode(AsteroidsSprite s) {
-
-		// Create sprites for explosion animation. The each individual line segment
-		// of the given sprite is used to create a new sprite that will move
-		// outward from the sprite's original position with a random rotation.
-
+	public void explode(SpriteObj s) {
 		s.render();
 		int c = (detail || s.sprite.npoints < 6) ? 1 : 2;
 
@@ -646,13 +610,13 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		// Spacebar: fire a photon and start its counter.
 
-		if (e.getKeyChar() == ' ' && ship.active) {
+		if (e.getKeyChar() == ' ' || true && ship.active) { //TODO: rm || true
 			if (!paused)
 				sound.play(sound.getFireSound(), 1);
 
 			photonTime = System.currentTimeMillis();
 			photonIndex++;
-			if (photonIndex >= MAX_SHOTS)
+			if (photonIndex >= Photon.MAX_SHOTS)
 				photonIndex = 0;
 
 			photons[photonIndex].launch(ship);
@@ -666,8 +630,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		// starting counter.
 
 		if (c == 'h' && ship.active && !ship.isHyperSpace()) {
-			ship.x = Math.random() * AsteroidsSprite.width;
-			ship.y = Math.random() * AsteroidsSprite.height;
+			ship.x = Math.random() * SpriteObj.width;
+			ship.y = Math.random() * SpriteObj.height;
 			ship.enterHyperSpace();
 			if (!paused)
 				sound.play(sound.getWarpSound(), 1);
@@ -700,7 +664,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			detail = !detail;
 
 		// 'S' key: start the game, if not already in progress.
-		if (c == 's' && loaded && !playing)
+		if (c == 's' && sound.isLoaded() && !playing)
 			initGame();
 
 	}
@@ -770,44 +734,35 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		// Draw photon bullets.
 
 		offGraphics.setColor(Color.white);
-		for (i = 0; i < MAX_SHOTS; i++)
-			if (photons[i].active)
-				photons[i].draw(offGraphics);
+		for (i = 0; i < Photon.MAX_SHOTS; i++)
+			photons[i].draw(offGraphics, detail);
 
 		// Draw the guided missile, counter is used to quickly fade color to black
 		// when near expiration.
 
 		c = Math.min(missile.getMissileCounter() * 24, 255);
 		offGraphics.setColor(new Color(c, c, c));
-		if (missile.active) {
-			offGraphics.drawPolygon(missile.sprite);
-			offGraphics.drawLine(missile.sprite.xpoints[missile.sprite.npoints - 1],
-					missile.sprite.ypoints[missile.sprite.npoints - 1], missile.sprite.xpoints[0],
-					missile.sprite.ypoints[0]);
-		}
 
-		// Draw the asteroids.
+		missile.draw(offGraphics, detail);
 
 		for (i = 0; i < MAX_ROCKS; i++)
-			if (asteroids[i].active)
-				asteroids[i].draw(detail, offGraphics);
+			asteroids[i].draw(offGraphics, detail);
 
-		if (ufo.active)
-			ufo.draw(offGraphics, detail);
+		ufo.draw(offGraphics, detail);
 
 			
 		// Draw the ship, counter is used to fade color to white on hyperspace.
 		c = 255 - (255 / Ship.HYPER_COUNT) * ship.getHyperSpaceCounter();
-		if (ship.active) {
 
-			boolean fill = detail && !ship.isHyperSpace();
-
-			boolean canDrawThrustor = !paused && detail;
-			boolean drawFwdThrustor = up && canDrawThrustor;
-			boolean drawRevThrustor = down && canDrawThrustor;
-
-			ship.draw(offGraphics, fill, drawFwdThrustor, drawRevThrustor, c);
+		boolean canDrawThrustor = !paused && detail;
+		if(canDrawThrustor){
+			if(up) ship.drawFwdThruster(offGraphics, detail);
+			if(down) ship.drawRevThruster(offGraphics, detail);
 		}
+
+		ship.setColor(c);
+		ship.draw(offGraphics, detail);
+
 
 		// Draw any explosion debris, counters are used to fade color to black.
 
@@ -841,7 +796,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			offGraphics.drawString(s, (d.width - fm.stringWidth(s)) / 2, d.height / 2 + fontHeight);
 			s = copyLink;
 			offGraphics.drawString(s, (d.width - fm.stringWidth(s)) / 2, d.height / 2 + 2 * fontHeight);
-			if (!loaded) {
+			if (!sound.isLoaded()) {
 				s = "Loading sounds...";
 				w = 4 * fontWidth + fm.stringWidth(s);
 				h = fontHeight;

@@ -1,5 +1,6 @@
 package my.asteroids.sprite;
 
+import java.awt.Graphics;
 import java.awt.Polygon;
 
 /******************************************************************************
@@ -7,7 +8,7 @@ import java.awt.Polygon;
  * position, movement and rotation. It also can detemine if two objects collide.
  ******************************************************************************/
 
-public class AsteroidsSprite {
+public abstract class SpriteObj {
 
 	// Fields:
 
@@ -27,7 +28,7 @@ public class AsteroidsSprite {
 
 	// Constructors:
 
-	public AsteroidsSprite() {
+	public SpriteObj() {
 
 		this.shape = new Polygon();
 		this.active = false;
@@ -96,7 +97,7 @@ public class AsteroidsSprite {
 							+ (int) Math.round(this.y) + height / 2);
 	}
 
-	public boolean isColliding(AsteroidsSprite s) {
+	public boolean isColliding(SpriteObj s) {
 
 		int i;
 
@@ -111,4 +112,13 @@ public class AsteroidsSprite {
 				return true;
 		return false;
 	}
+	
+
+	public void draw(Graphics offGraphics, boolean detailed){
+		if(active){
+			onDraw(offGraphics, detailed);
+		}
+	}
+
+	protected abstract void onDraw(Graphics offGraphics, boolean detailed);
 }
