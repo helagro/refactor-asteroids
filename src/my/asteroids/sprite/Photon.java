@@ -1,5 +1,7 @@
 package my.asteroids.sprite;
 
+import java.awt.Graphics;
+
 public class Photon extends AsteroidsSprite{
 
 
@@ -16,6 +18,10 @@ public class Photon extends AsteroidsSprite{
         y = fromShip.y;
         deltaX = 2 * Asteroid.MAX_ROCK_SPEED * -Math.sin(fromShip.angle);
         deltaY = 2 * Asteroid.MAX_ROCK_SPEED * Math.cos(fromShip.angle);
+    }
+
+    public void draw(Graphics offGraphics){
+        offGraphics.drawPolygon(sprite);
     }
 
 }

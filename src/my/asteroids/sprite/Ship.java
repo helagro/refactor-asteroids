@@ -1,5 +1,6 @@
 package my.asteroids.sprite;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import my.asteroids.Asteroids;
@@ -44,7 +45,7 @@ public class Ship extends AsteroidsSprite{
     @Override
     public boolean advance() {
         positionThrusters();
-        
+
         return super.advance();
     }
 
@@ -56,12 +57,27 @@ public class Ship extends AsteroidsSprite{
 
 
 
-    public void runFwdThrustor(Graphics offGraphics){
-        fwdThruster.run(offGraphics);
-    }
+    public void draw(Graphics offGraphics, boolean fill, boolean drawFwdThrustor, boolean drawRevThrustor, int c){
+        if (fill) {
+            offGraphics.setColor(Color.black);
+            offGraphics.fillPolygon(sprite);
+        }
+        offGraphics.setColor(new Color(c, c, c));
+        offGraphics.drawPolygon(sprite);
+        offGraphics.drawLine(sprite.xpoints[sprite.npoints - 1],
+                sprite.ypoints[sprite.npoints - 1], sprite.xpoints[0], sprite.ypoints[0]);
 
-    public void runRwdThrustor(Graphics offGraphics){
-        revThruster.run(offGraphics);
+
+        // Draw thruster exhaust if thrusters are on. Do it randomly to get a
+        // flicker effect.
+
+        boolean thrustorFlickerOn = Math.random() < 0.5;
+
+        if(thrustorFlickerOn && drawFwdThrustor)
+            fwdThruster.run(offGraphics);
+
+        if(thrustorFlickerOn && drawRevThrustor)
+            revThruster.run(offGraphics);
     }
 
 

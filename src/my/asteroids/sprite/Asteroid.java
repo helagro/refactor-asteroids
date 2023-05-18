@@ -1,5 +1,7 @@
 package my.asteroids.sprite;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Polygon;
 
 import my.asteroids.Asteroids;
@@ -23,8 +25,6 @@ public class Asteroid extends AsteroidsSprite{
 
 
     public void init(double asteroidsSpeed){
-        int x, y;
-
         // Create a jagged shape for the asteroid and give it a random rotation.
 
         shape = new Polygon();
@@ -32,8 +32,8 @@ public class Asteroid extends AsteroidsSprite{
         for (int j = 0; j < s; j++) {
             double theta = 2 * Math.PI / s * j;
             double r = MIN_ROCK_SIZE + (int) (Math.random() * (MAX_ROCK_SIZE - MIN_ROCK_SIZE));
-            x = (int) -Math.round(r * Math.sin(theta));
-            y = (int) Math.round(r * Math.cos(theta));
+            int x = (int) -Math.round(r * Math.sin(theta));
+            int y = (int) Math.round(r * Math.cos(theta));
             shape.addPoint(x, y);
         }
         active = true;
@@ -46,9 +46,9 @@ public class Asteroid extends AsteroidsSprite{
             x = -AsteroidsSprite.width / 2;
             if (Math.random() < 0.5)
                 x = AsteroidsSprite.width / 2;
-            this.y = Math.random() * AsteroidsSprite.height;
+            y = Math.random() * AsteroidsSprite.height;
         } else {
-            this.x = Math.random() * AsteroidsSprite.width;
+            x = Math.random() * AsteroidsSprite.width;
             y = -AsteroidsSprite.height / 2;
             if (Math.random() < 0.5)
                 y = AsteroidsSprite.height / 2;
@@ -88,5 +88,18 @@ public class Asteroid extends AsteroidsSprite{
 
         isSmall = true;
         render();
+    }
+
+
+    public void draw(boolean detail, Graphics offGraphics){
+        if (detail) {
+            offGraphics.setColor(Color.black);
+            offGraphics.fillPolygon(sprite);
+        }
+        offGraphics.setColor(Color.white);
+        offGraphics.drawPolygon(sprite);
+        offGraphics.drawLine(sprite.xpoints[sprite.npoints - 1],
+                sprite.ypoints[sprite.npoints - 1], sprite.xpoints[0],
+                sprite.ypoints[0]);
     }
 }

@@ -968,7 +968,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		offGraphics.setColor(Color.white);
 		for (i = 0; i < MAX_SHOTS; i++)
 			if (photons[i].active)
-				offGraphics.drawPolygon(photons[i].sprite);
+				photons[i].draw(offGraphics);
 
 		// Draw the guided missile, counter is used to quickly fade color to black
 		// when near expiration.
@@ -985,17 +985,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		// Draw the asteroids.
 
 		for (i = 0; i < MAX_ROCKS; i++)
-			if (asteroids[i].active) {
-				if (detail) {
-					offGraphics.setColor(Color.black);
-					offGraphics.fillPolygon(asteroids[i].sprite);
-				}
-				offGraphics.setColor(Color.white);
-				offGraphics.drawPolygon(asteroids[i].sprite);
-				offGraphics.drawLine(asteroids[i].sprite.xpoints[asteroids[i].sprite.npoints - 1],
-						asteroids[i].sprite.ypoints[asteroids[i].sprite.npoints - 1], asteroids[i].sprite.xpoints[0],
-						asteroids[i].sprite.ypoints[0]);
-			}
+			if (asteroids[i].active)
+				asteroids[i].draw(detail, offGraphics);
 
 		// Draw the flying saucer.
 
@@ -1014,25 +1005,14 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		c = 255 - (255 / HYPER_COUNT) * hyperCounter;
 		if (ship.active) {
-			if (detail && hyperCounter == 0) {
-				offGraphics.setColor(Color.black);
-				offGraphics.fillPolygon(ship.sprite);
-			}
-			offGraphics.setColor(new Color(c, c, c));
-			offGraphics.drawPolygon(ship.sprite);
-			offGraphics.drawLine(ship.sprite.xpoints[ship.sprite.npoints - 1],
-					ship.sprite.ypoints[ship.sprite.npoints - 1], ship.sprite.xpoints[0], ship.sprite.ypoints[0]);
 
-			// Draw thruster exhaust if thrusters are on. Do it randomly to get a
-			// flicker effect.
+			boolean fill = detail && hyperCounter == 0;
 
-			if (!paused && detail && Math.random() < 0.5) {
-				if (up) 
-					ship.runFwdThrustor(offGraphics);
+			boolean canDrawThrustor = !paused && detail;
+			boolean drawFwdThrustor = up && canDrawThrustor;
+			boolean drawRevThrustor = down && canDrawThrustor;
 
-				if (down) 
-					ship.runRwdThrustor(offGraphics);
-			}
+			ship.draw(offGraphics, fill, drawFwdThrustor, drawRevThrustor, c);
 		}
 
 		// Draw any explosion debris, counters are used to fade color to black.
