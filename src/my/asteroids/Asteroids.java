@@ -27,6 +27,8 @@ import java.awt.Point;
 import java.awt.Polygon;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
+import my.asteroids.sprite.Asteroid;
 import my.asteroids.sprite.AsteroidsSprite;
 import my.asteroids.sprite.Ship;
 
@@ -60,13 +62,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	static final int Missile_COUNT = 4 * FPS; // seconds x frames per second.
 	static final int STORM_PAUSE = 2 * FPS;
 
-	static final int MIN_ROCK_SIDES = 6; // Ranges for asteroid shape, size
-	static final int MAX_ROCK_SIDES = 16; // speed and rotation.
-	static final int MIN_ROCK_SIZE = 20;
-	static final int MAX_ROCK_SIZE = 40;
-	static final double MIN_ROCK_SPEED = 40.0 / FPS;
-	static final double MAX_ROCK_SPEED = 240.0 / FPS;
-	static final double MAX_ROCK_SPIN = Math.PI / FPS;
 
 	static final int MAX_SHIPS = 3; // Starting number of ships for
 									// each game.
@@ -74,8 +69,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 										// saucer per appearance.
 
 	// Ship's rotation and acceleration rates and maximum speed.
-
-	static final double MAX_SHIP_SPEED = 1.25 * MAX_ROCK_SPEED;
 
 	static final int FIRE_DELAY = 50; // Minimum number of milliseconds
 										// required between photon shots.
@@ -130,7 +123,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	AsteroidsSprite ufo;
 	AsteroidsSprite missile;
 	AsteroidsSprite[] photons = new AsteroidsSprite[MAX_SHOTS];
-	AsteroidsSprite[] asteroids = new AsteroidsSprite[MAX_ROCKS];
+	Asteroid[] asteroids = new Asteroid[MAX_ROCKS];
 	AsteroidsSprite[] explosions = new AsteroidsSprite[MAX_SCRAP];
 
 	// Ship data.
@@ -287,7 +280,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		// Create asteroid sprites.
 
 		for (i = 0; i < MAX_ROCKS; i++)
-			asteroids[i] = new AsteroidsSprite();
+			asteroids[i] = new Asteroid();
 
 		// Create explosion sprites.
 
@@ -309,7 +302,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		score = 0;
 		shipsLeft = MAX_SHIPS;
-		asteroidsSpeed = MIN_ROCK_SPEED;
+		asteroidsSpeed = Asteroid.MIN_ROCK_SPEED;
 		newShipScore = NEW_SHIP_POINTS;
 		newUfoScore = NEW_UFO_POINTS;
 		initShip();
@@ -358,8 +351,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	}
 
 	public void run() {
-
-		int i, j;
 		long startTime;
 
 		// Lower this thread's priority and get the current time.
@@ -447,47 +438,14 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	}
 
 	public void updateShip() {
-
-		double dx, dy, speed;
-
 		if (!playing)
 			return;
 
-		// Rotate the ship if left or right cursor key is down.
+		if (left) ship.rotateLeft();
+		if (right) ship.rotateRight();
 
-		if (left) {
-			ship.rotateLeft();
-		}
-		if (right) {
-			ship.rotateRight();
-		}
-
-		// Fire thrusters if up or down cursor key is down.
-
-		if (up) {
-			ship.moveForward();
-		}
-		if (down) {
-			ship.moveBackward();
-		}
-
-		// Don't let ship go past the speed limit.
-
-		if (up || down) {
-			speed = Math.sqrt(ship.deltaX * ship.deltaX + ship.deltaY * ship.deltaY);
-			if (speed > MAX_SHIP_SPEED) {
-				dx = MAX_SHIP_SPEED * -Math.sin(ship.angle);
-				dy = MAX_SHIP_SPEED * Math.cos(ship.angle);
-				if (up)
-					ship.deltaX = dx;
-				else
-					ship.deltaX = -dx;
-				if (up)
-					ship.deltaY = dy;
-				else
-					ship.deltaY = -dy;
-			}
-		}
+		if (up) ship.moveForward();
+		if (down) ship.moveBackward();
 
 		// Move the ship. If it is currently in hyperspace, advance the countdown.
 
@@ -560,7 +518,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		ufo.x = -AsteroidsSprite.width / 2;
 		ufo.y = Math.random() * 2 * AsteroidsSprite.height - AsteroidsSprite.height;
 		angle = Math.random() * Math.PI / 4 - Math.PI / 2;
-		speed = MAX_ROCK_SPEED / 2 + Math.random() * (MAX_ROCK_SPEED / 2);
+		speed = Asteroid.MAX_ROCK_SPEED / 2 + Math.random() * (Asteroid.MAX_ROCK_SPEED / 2);
 		ufo.deltaX = speed * -Math.sin(angle);
 		ufo.deltaY = speed * Math.cos(angle);
 		if (Math.random() < 0.5) {
@@ -607,7 +565,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 				// close to it.
 
 				d = (int) Math.max(Math.abs(ufo.x - ship.x), Math.abs(ufo.y - ship.y));
-				if (ship.active && hyperCounter <= 0 && ufo.active && !missile.active && d > MAX_ROCK_SPEED * FPS / 2
+				if (ship.active && hyperCounter <= 0 && ufo.active && !missile.active && d > Asteroid.MAX_ROCK_SPEED * FPS / 2
 						&& Math.random() < Missile_PROBABILITY)
 					initMissile();
 			}
@@ -706,8 +664,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		// Change the missile's angle so that it points toward the ship.
 
-		missile.deltaX = 0.75 * MAX_ROCK_SPEED * -Math.sin(missile.angle);
-		missile.deltaY = 0.75 * MAX_ROCK_SPEED * Math.cos(missile.angle);
+		missile.deltaX = 0.75 * Asteroid.MAX_ROCK_SPEED * -Math.sin(missile.angle);
+		missile.deltaY = 0.75 * Asteroid.MAX_ROCK_SPEED * Math.cos(missile.angle);
 	}
 
 	public void stopMissile() {
@@ -720,61 +678,16 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	}
 
 	public void initAsteroids() {
-
-		int i, j;
-		int s;
-		double theta, r;
-		int x, y;
-
 		// Create random shapes, positions and movements for each asteroid.
 
-		for (i = 0; i < MAX_ROCKS; i++) {
-
-			// Create a jagged shape for the asteroid and give it a random rotation.
-
-			asteroids[i].shape = new Polygon();
-			s = MIN_ROCK_SIDES + (int) (Math.random() * (MAX_ROCK_SIDES - MIN_ROCK_SIDES));
-			for (j = 0; j < s; j++) {
-				theta = 2 * Math.PI / s * j;
-				r = MIN_ROCK_SIZE + (int) (Math.random() * (MAX_ROCK_SIZE - MIN_ROCK_SIZE));
-				x = (int) -Math.round(r * Math.sin(theta));
-				y = (int) Math.round(r * Math.cos(theta));
-				asteroids[i].shape.addPoint(x, y);
-			}
-			asteroids[i].active = true;
-			asteroids[i].angle = 0.0;
-			asteroids[i].deltaAngle = Math.random() * 2 * MAX_ROCK_SPIN - MAX_ROCK_SPIN;
-
-			// Place the asteroid at one edge of the screen.
-
-			if (Math.random() < 0.5) {
-				asteroids[i].x = -AsteroidsSprite.width / 2;
-				if (Math.random() < 0.5)
-					asteroids[i].x = AsteroidsSprite.width / 2;
-				asteroids[i].y = Math.random() * AsteroidsSprite.height;
-			} else {
-				asteroids[i].x = Math.random() * AsteroidsSprite.width;
-				asteroids[i].y = -AsteroidsSprite.height / 2;
-				if (Math.random() < 0.5)
-					asteroids[i].y = AsteroidsSprite.height / 2;
-			}
-
-			// Set a random motion for the asteroid.
-
-			asteroids[i].deltaX = Math.random() * asteroidsSpeed;
-			if (Math.random() < 0.5)
-				asteroids[i].deltaX = -asteroids[i].deltaX;
-			asteroids[i].deltaY = Math.random() * asteroidsSpeed;
-			if (Math.random() < 0.5)
-				asteroids[i].deltaY = -asteroids[i].deltaY;
-
-			asteroids[i].render();
+		for (int i = 0; i < MAX_ROCKS; i++){
+			asteroids[i].init(asteroidsSpeed);
 			asteroidIsSmall[i] = false;
 		}
 
 		asteroidsCounter = STORM_PAUSE;
 		asteroidsLeft = MAX_ROCKS;
-		if (asteroidsSpeed < MAX_ROCK_SPEED)
+		if (asteroidsSpeed < Asteroid.MAX_ROCK_SPEED)
 			asteroidsSpeed += 0.5;
 	}
 
@@ -799,17 +712,17 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		do {
 			if (!asteroids[i].active) {
 				asteroids[i].shape = new Polygon();
-				s = MIN_ROCK_SIDES + (int) (Math.random() * (MAX_ROCK_SIDES - MIN_ROCK_SIDES));
+				s = Asteroid.MIN_ROCK_SIDES + (int) (Math.random() * (Asteroid.MAX_ROCK_SIDES - Asteroid.MIN_ROCK_SIDES));
 				for (j = 0; j < s; j++) {
 					theta = 2 * Math.PI / s * j;
-					r = (MIN_ROCK_SIZE + (int) (Math.random() * (MAX_ROCK_SIZE - MIN_ROCK_SIZE))) / 2;
+					r = (Asteroid.MIN_ROCK_SIZE + (int) (Math.random() * (Asteroid.MAX_ROCK_SIZE - Asteroid.MIN_ROCK_SIZE))) / 2;
 					x = (int) -Math.round(r * Math.sin(theta));
 					y = (int) Math.round(r * Math.cos(theta));
 					asteroids[i].shape.addPoint(x, y);
 				}
 				asteroids[i].active = true;
 				asteroids[i].angle = 0.0;
-				asteroids[i].deltaAngle = Math.random() * 2 * MAX_ROCK_SPIN - MAX_ROCK_SPIN;
+				asteroids[i].deltaAngle = Math.random() * 2 * Asteroid.MAX_ROCK_SPIN - Asteroid.MAX_ROCK_SPIN;
 				asteroids[i].x = tempX;
 				asteroids[i].y = tempY;
 				asteroids[i].deltaX = Math.random() * 2 * asteroidsSpeed - asteroidsSpeed;
@@ -906,9 +819,9 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			explosions[explosionIndex].x = s.x + cx;
 			explosions[explosionIndex].y = s.y + cy;
 			explosions[explosionIndex].angle = s.angle;
-			explosions[explosionIndex].deltaAngle = 4 * (Math.random() * 2 * MAX_ROCK_SPIN - MAX_ROCK_SPIN);
-			explosions[explosionIndex].deltaX = (Math.random() * 2 * MAX_ROCK_SPEED - MAX_ROCK_SPEED + s.deltaX) / 2;
-			explosions[explosionIndex].deltaY = (Math.random() * 2 * MAX_ROCK_SPEED - MAX_ROCK_SPEED + s.deltaY) / 2;
+			explosions[explosionIndex].deltaAngle = 4 * (Math.random() * 2 * Asteroid.MAX_ROCK_SPIN - Asteroid.MAX_ROCK_SPIN);
+			explosions[explosionIndex].deltaX = (Math.random() * 2 * Asteroid.MAX_ROCK_SPEED - Asteroid.MAX_ROCK_SPEED + s.deltaX) / 2;
+			explosions[explosionIndex].deltaY = (Math.random() * 2 * Asteroid.MAX_ROCK_SPEED - Asteroid.MAX_ROCK_SPEED + s.deltaY) / 2;
 			explosionCounter[explosionIndex] = SCRAP_COUNT;
 		}
 	}
@@ -962,8 +875,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			photons[photonIndex].active = true;
 			photons[photonIndex].x = ship.x;
 			photons[photonIndex].y = ship.y;
-			photons[photonIndex].deltaX = 2 * MAX_ROCK_SPEED * -Math.sin(ship.angle);
-			photons[photonIndex].deltaY = 2 * MAX_ROCK_SPEED * Math.cos(ship.angle);
+			photons[photonIndex].deltaX = 2 * Asteroid.MAX_ROCK_SPEED * -Math.sin(ship.angle);
+			photons[photonIndex].deltaY = 2 * Asteroid.MAX_ROCK_SPEED * Math.cos(ship.angle);
 		}
 
 		// Allow upper or lower case characters for remaining keys.

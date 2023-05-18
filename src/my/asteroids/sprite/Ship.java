@@ -9,6 +9,7 @@ public class Ship extends AsteroidsSprite{
 
 	static final double SHIP_ANGLE_STEP = Math.PI / Asteroids.FPS;
 	static final double SHIP_SPEED_STEP = 15.0 / Asteroids.FPS;
+	static final double MAX_SHIP_SPEED = 1.25 * Asteroid.MAX_ROCK_SPEED;
 
 
     FwdThruster fwdThruster;
@@ -83,6 +84,8 @@ public class Ship extends AsteroidsSprite{
 
         deltaX += dx;
         deltaY += dy;
+
+        noSpeeding(true);
     }
     
     public void moveBackward(){
@@ -91,5 +94,23 @@ public class Ship extends AsteroidsSprite{
 
         deltaX -= dx;
         deltaY -= dy;
+
+        noSpeeding(false);
+    }
+
+    private void noSpeeding(boolean fwd){
+        double speed = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        if (speed > MAX_SHIP_SPEED) {
+            double dx = MAX_SHIP_SPEED * -Math.sin(angle);
+            double dy = MAX_SHIP_SPEED * Math.cos(angle);
+            if (fwd)
+                deltaX = dx;
+            else
+                deltaX = -dx;
+            if (fwd)
+                deltaY = dy;
+            else
+                deltaY = -dy;
+        }
     }
 }
