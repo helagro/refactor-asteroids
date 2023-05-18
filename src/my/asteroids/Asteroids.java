@@ -30,6 +30,7 @@ import java.awt.event.KeyListener;
 
 import my.asteroids.sprite.Asteroid;
 import my.asteroids.sprite.AsteroidsSprite;
+import my.asteroids.sprite.Explosion;
 import my.asteroids.sprite.Photon;
 import my.asteroids.sprite.Ship;
 
@@ -54,7 +55,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	public static final int FPS = // the resulting frame rate.
 			Math.round(1000 / DELAY);
 
-	static final int MAX_SHOTS = 8; // Maximum number of sprites
+	static final int MAX_SHOTS = 80; // Maximum number of sprites TODO: 8
 	static final int MAX_ROCKS = 8; // for photons, asteroids and
 	static final int MAX_SCRAP = 40; // explosions.
 
@@ -71,7 +72,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 	// Ship's rotation and acceleration rates and maximum speed.
 
-	static final int FIRE_DELAY = 50; // Minimum number of milliseconds
+	static final int FIRE_DELAY = 10; // Minimum number of milliseconds TODO: 50
 										// required between photon shots.
 
 	// Probablility of flying saucer firing a missile during any given frame
@@ -125,13 +126,13 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	AsteroidsSprite missile;
 	Photon[] photons = new Photon[MAX_SHOTS];
 	Asteroid[] asteroids = new Asteroid[MAX_ROCKS];
-	AsteroidsSprite[] explosions = new AsteroidsSprite[MAX_SCRAP];
+	Explosion[] explosions = new Explosion[MAX_SCRAP];
 
 	// Ship data.
 
 	int shipsLeft; // Number of ships left in game, including current one.
 	int shipCounter; // Timer counter for ship explosion.
-	int hyperCounter; // Timer counter for hyperspace.
+	int hyperCounter; // Timer counter for hyperspace. 
 
 	// Photon data.
 
@@ -242,9 +243,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		ship = new Ship();
 
-
-		// Create shape for each photon sprites.
-
 		for (i = 0; i < MAX_SHOTS; i++)
 			photons[i] = new Photon();
 		
@@ -274,15 +272,11 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		missile.shape.addPoint(-1, 3);
 		missile.shape.addPoint(-1, -3);
 
-		// Create asteroid sprites.
-
 		for (i = 0; i < MAX_ROCKS; i++)
 			asteroids[i] = new Asteroid();
 
-		// Create explosion sprites.
-
 		for (i = 0; i < MAX_SCRAP; i++)
-			explosions[i] = new AsteroidsSprite();
+			explosions[i] = new Explosion();
 
 		// Initialize game data and put us in 'game over' mode.
 
@@ -396,9 +390,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 				// If all asteroids have been destroyed create a new batch.
 
-				if (asteroidsLeft <= 0)
-					if (--asteroidsCounter <= 0)
-						initAsteroids();
+				if (asteroidsLeft <= 0 && --asteroidsCounter <= 0)
+					initAsteroids();
 			}
 
 			// Update the screen and set the timer for the next loop.
@@ -459,7 +452,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		// (This gives the player time to move the ship if it is in imminent
 		// danger.) If that was the last ship, end the game.
 
-		else if (--shipCounter <= 0)
+		else if (true)
 			if (shipsLeft > 0) {
 				initShip();
 				hyperCounter = HYPER_COUNT;
@@ -530,7 +523,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	public void updateUfo() {
 
 		int i, d;
-		boolean wrapped;
 
 		// Move the flying saucer and check for collision with a photon. Stop it
 		// when its counter has expired.
@@ -751,8 +743,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		int i;
 
 		for (i = 0; i < MAX_SCRAP; i++) {
-			explosions[i].shape = new Polygon();
-			explosions[i].active = false;
+			explosions[i].init();
 			explosionCounter[i] = 0;
 		}
 		explosionIndex = 0;
@@ -761,7 +752,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	public void explode(AsteroidsSprite s) {
 
 		int c, i, j;
-		int cx, cy;
 
 		// Create sprites for explosion animation. The each individual line segment
 		// of the given sprite is used to create a new sprite that will move
@@ -775,21 +765,13 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			explosionIndex++;
 			if (explosionIndex >= MAX_SCRAP)
 				explosionIndex = 0;
-			explosions[explosionIndex].active = true;
-			explosions[explosionIndex].shape = new Polygon();
+
 			j = i + 1;
 			if (j >= s.sprite.npoints)
 				j -= s.sprite.npoints;
-			cx = (int) ((s.shape.xpoints[i] + s.shape.xpoints[j]) / 2);
-			cy = (int) ((s.shape.ypoints[i] + s.shape.ypoints[j]) / 2);
-			explosions[explosionIndex].shape.addPoint(s.shape.xpoints[i] - cx, s.shape.ypoints[i] - cy);
-			explosions[explosionIndex].shape.addPoint(s.shape.xpoints[j] - cx, s.shape.ypoints[j] - cy);
-			explosions[explosionIndex].x = s.x + cx;
-			explosions[explosionIndex].y = s.y + cy;
-			explosions[explosionIndex].angle = s.angle;
-			explosions[explosionIndex].deltaAngle = 4 * (Math.random() * 2 * Asteroid.MAX_ROCK_SPIN - Asteroid.MAX_ROCK_SPIN);
-			explosions[explosionIndex].deltaX = (Math.random() * 2 * Asteroid.MAX_ROCK_SPEED - Asteroid.MAX_ROCK_SPEED + s.deltaX) / 2;
-			explosions[explosionIndex].deltaY = (Math.random() * 2 * Asteroid.MAX_ROCK_SPEED - Asteroid.MAX_ROCK_SPEED + s.deltaY) / 2;
+
+
+			explosions[explosionIndex].explode(s, i, j);
 			explosionCounter[explosionIndex] = SCRAP_COUNT;
 		}
 	}

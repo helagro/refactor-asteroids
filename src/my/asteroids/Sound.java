@@ -15,19 +15,18 @@ public class Sound {
 
     // Counter and total used to track the loading of the sound clips.
 
-	int clipTotal = 0;
-	int clipsLoaded = 0;
+	private int clipTotal = 0;
+	private int clipsLoaded = 0;
 
     // Sound clips.
 
-    Clip crashSound;
-	Clip explosionSound;
-	Clip fireSound;
-	Clip missileSound;
-	Clip saucerSound;
-	Clip thrustersSound;
-	Clip warpSound;
-
+    private Clip crashSound;
+	private Clip explosionSound;
+	private Clip fireSound;
+	private Clip missileSound;
+	private Clip saucerSound;
+	private Clip thrustersSound;
+	private Clip warpSound;
 
 
     // ========= LOAD ==========
@@ -132,4 +131,5 @@ public class Sound {
         thrustersSound.stop();
         warpSound.stop();
     }
+
 }
