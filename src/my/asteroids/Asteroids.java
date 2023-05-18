@@ -56,12 +56,10 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	public static final int FPS = // the resulting frame rate.
 			Math.round(1000 / DELAY);
 
-	static final int MAX_ROCKS = 8; // for photons, asteroids and
-	static final int MAX_SCRAP = 40; // explosions.
+	static final int MAX_SCRAP = 40;
 
 	static final int SCRAP_COUNT = 2 * FPS; // Timer counter starting values
 	static final int STORM_PAUSE = 2 * FPS;
-
 
 	static final int BIG_POINTS = 25; // Points scored for shooting
 	static final int SMALL_POINTS = 50; // various objects.
@@ -103,7 +101,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	FlyingSaucer ufo;
 
 	Photon[] photons = new Photon[Photon.MAX_SHOTS];
-	Asteroid[] asteroids = new Asteroid[MAX_ROCKS];
+	Asteroid[] asteroids = new Asteroid[Asteroid.MAX_ROCKS];
 	Explosion[] explosions = new Explosion[MAX_SCRAP];
 
 	// Ship data.
@@ -215,7 +213,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		ufo = new FlyingSaucer();
 
 
-		for (i = 0; i < MAX_ROCKS; i++)
+		for (i = 0; i < Asteroid.MAX_ROCKS; i++)
 			asteroids[i] = new Asteroid();
 
 		for (i = 0; i < MAX_SCRAP; i++)
@@ -238,8 +236,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		asteroidsSpeed = Asteroid.MIN_ROCK_SPEED;
 		newShipScore = NEW_SHIP_POINTS;
 		newUfoScore = FlyingSaucer.NEW_UFO_POINTS;
+		photonIndex = 0;
 		initShip(true);
-		initPhotons();
 
 		ufo.stop();
 		missile.stop();
@@ -398,27 +396,9 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		thrustersPlaying = false;
 	}
 
-	public void initPhotons() {
-		int i;
-
-		for (i = 0; i < Photon.MAX_SHOTS; i++)
-			photons[i].active = false;
-		photonIndex = 0;
-	}
-
 	public void updatePhotons() {
-
-		int i;
-
-		// Move any active photons. Stop it when its counter has expired.
-
-		for (i = 0; i < Photon.MAX_SHOTS; i++)
-			if (photons[i].active) {
-				if (!photons[i].advance())
-					photons[i].render();
-				else
-					photons[i].active = false;
-			}
+		for(Photon photon : photons)
+			photon.advance();
 	}
 
 	public void updateUfo() {
@@ -462,19 +442,15 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 				missile.stop();
 				score += Missile_POINTS;
 			}
-		
 	}
 
 
 	public void initAsteroids() {
-		// Create random shapes, positions and movements for each asteroid.
-
-		for (int i = 0; i < MAX_ROCKS; i++){
-			asteroids[i].init(asteroidsSpeed);
-		}
+		for (Asteroid asteroid : asteroids)
+			asteroid.init(asteroidsSpeed);
 
 		asteroidsCounter = STORM_PAUSE;
-		asteroidsLeft = MAX_ROCKS;
+		asteroidsLeft = Asteroid.MAX_ROCKS;
 		if (asteroidsSpeed < Asteroid.MAX_ROCK_SPEED)
 			asteroidsSpeed += 0.5;
 	}
@@ -497,16 +473,16 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 				asteroidsLeft++;
 			}
 			i++;
-		} while (i < MAX_ROCKS && count < 2);
+		} while (i < Asteroid.MAX_ROCKS && count < 2);
 	}
 
 	public void updateAsteroids() {
 
-		int i, j;
+		int i;
 
 		// Move any active asteroids and check for collisions.
 
-		for (i = 0; i < MAX_ROCKS; i++){
+		for (i = 0; i < Asteroid.MAX_ROCKS; i++){
 			if (asteroids[i].active) {
 				asteroids[i].advance();
 				asteroids[i].render();
@@ -588,8 +564,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	}
 
 	public void keyPressed(KeyEvent e) {
-		char c;
-
 		// Check if any cursor keys have been pressed and set flags.
 
 		if (e.getKeyCode() == KeyEvent.VK_LEFT)
@@ -621,11 +595,10 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		// Allow upper or lower case characters for remaining keys.
 
-		c = Character.toLowerCase(e.getKeyChar());
+		char c = Character.toLowerCase(e.getKeyChar());
 
 		// 'H' key: warp ship into hyperspace by moving to a random location and
 		// starting counter.
-
 		if (c == 'h' && ship.active && !ship.isHyperSpace()) {
 			ship.teleportRandom();
 			ship.enterHyperSpace();
@@ -633,9 +606,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			sound.play(sound.getWarpSound(), 1);
 		}
 
-		// 'P' key: toggle pause mode and start or stop any active looping sound
-		// clips.
-
+		// 'P' key: toggle pause mode and start or stop any active looping sound clips.
 		if (c == 'p') {
 			sound.toggleMute(false);
 			if(!sound.isMuted()){
@@ -646,7 +617,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		}
 
 		// 'M' key: toggle sound on or off and stop any looping sound clips.
-
 		if (c == 'm') {
 			sound.toggleMute(true);
 
@@ -666,8 +636,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	}
 
 	public void keyReleased(KeyEvent e) {
-
-		// Check if any cursor keys where released and set flags.
 
 		if (e.getKeyCode() == KeyEvent.VK_LEFT)
 			left = false;
@@ -731,7 +699,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		for (i = 0; i < Photon.MAX_SHOTS; i++)
 			photons[i].draw(offGraphics, detail);
 
-		for (i = 0; i < MAX_ROCKS; i++)
+		for (i = 0; i < Asteroid.MAX_ROCKS; i++)
 			asteroids[i].draw(offGraphics, detail);
 
 		ufo.draw(offGraphics, detail);

@@ -6,13 +6,15 @@ import java.awt.Graphics;
 import my.asteroids.Sound;
 
 public class Photon extends SpriteObj{
-	public static final int MAX_SHOTS = 80; // Maximum number of sprites TODO: 8
+	public static final int MAX_SHOTS = 8; // Maximum number of sprites
 
     public Photon(){
         shape.addPoint(1, 1);
         shape.addPoint(1, -1);
         shape.addPoint(-1, 1);
         shape.addPoint(-1, -1);
+
+        active = false;
     }
 
     public void launch(Ship fromShip){
@@ -43,6 +45,15 @@ public class Photon extends SpriteObj{
             }
         }
 
+        return false;
+    }
+
+
+    @Override
+    public boolean advance() {
+        boolean outOfBounds = super.advance();
+        if(outOfBounds) active = false;
+        else render();
         return false;
     }
 
