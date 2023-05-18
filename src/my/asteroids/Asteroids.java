@@ -30,6 +30,7 @@ import java.awt.event.KeyListener;
 
 import my.asteroids.sprite.Asteroid;
 import my.asteroids.sprite.AsteroidsSprite;
+import my.asteroids.sprite.Photon;
 import my.asteroids.sprite.Ship;
 
 public class Asteroids extends Panel implements Runnable, KeyListener {
@@ -122,7 +123,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 	AsteroidsSprite ufo;
 	AsteroidsSprite missile;
-	AsteroidsSprite[] photons = new AsteroidsSprite[MAX_SHOTS];
+	Photon[] photons = new Photon[MAX_SHOTS];
 	Asteroid[] asteroids = new Asteroid[MAX_ROCKS];
 	AsteroidsSprite[] explosions = new AsteroidsSprite[MAX_SCRAP];
 
@@ -184,6 +185,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 	Sound sound = new Sound();
 
+
 	public String getAppletInfo() {
 
 		// Return copyright information.
@@ -243,13 +245,9 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		// Create shape for each photon sprites.
 
-		for (i = 0; i < MAX_SHOTS; i++) {
-			photons[i] = new AsteroidsSprite();
-			photons[i].shape.addPoint(1, 1);
-			photons[i].shape.addPoint(1, -1);
-			photons[i].shape.addPoint(-1, 1);
-			photons[i].shape.addPoint(-1, -1);
-		}
+		for (i = 0; i < MAX_SHOTS; i++)
+			photons[i] = new Photon();
+		
 
 		// Create shape for the flying saucer.
 
@@ -484,7 +482,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	}
 
 	public void initPhotons() {
-
 		int i;
 
 		for (i = 0; i < MAX_SHOTS; i++)
@@ -690,23 +687,15 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	}
 
 	public void initSmallAsteroids(int n) {
-
-		int count;
-		int i, j;
-		int s;
-		double tempX, tempY;
-		double theta, r;
-		int x, y;
-
 		// Create one or two smaller asteroids from a larger one using inactive
 		// asteroids. The new asteroids will be placed in the same position as the
 		// old one but will have a new, smaller shape and new, randomly generated
 		// movements.
 
-		count = 0;
-		i = 0;
-		tempX = asteroids[n].x;
-		tempY = asteroids[n].y;
+		int count = 0;
+		int i = 0;
+		double tempX = asteroids[n].x;
+		double tempY = asteroids[n].y;
 		do {
 			if (!asteroids[i].active) {
 				asteroids[i].shrink(tempX, tempY, asteroidsSpeed);

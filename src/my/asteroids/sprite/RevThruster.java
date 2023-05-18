@@ -4,8 +4,7 @@ import java.awt.Graphics;
 
 
 public class RevThruster extends Thruster{
-    @Override
-    public void render() {
+    RevThruster(){
         shape.addPoint(-2, 12);
 		shape.addPoint(-4, 14);
 		shape.addPoint(-2, 20);
@@ -14,9 +13,8 @@ public class RevThruster extends Thruster{
 		shape.addPoint(4, 14);
 		shape.addPoint(2, 20);
 		shape.addPoint(0, 14);
-
-        super.render();
     }
+
 
     void run(Graphics offGraphics){
         offGraphics.drawPolygon(sprite);

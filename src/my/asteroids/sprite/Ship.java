@@ -19,6 +19,10 @@ public class Ship extends AsteroidsSprite{
     public Ship(){
         fwdThruster = new FwdThruster();
 		revThruster = new RevThruster();
+
+        shape.addPoint(0, -10);
+		shape.addPoint(7, 10);
+		shape.addPoint(-7, 10);
     }
 
 
@@ -41,16 +45,6 @@ public class Ship extends AsteroidsSprite{
     public void positionThrusters(){
         revThruster.position(this);
         fwdThruster.position(this);
-    }
-
-
-    @Override
-    public void render() {
-        shape.addPoint(0, -10);
-		shape.addPoint(7, 10);
-		shape.addPoint(-7, 10);
-
-        super.render();
     }
 
 
