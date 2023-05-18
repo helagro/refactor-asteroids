@@ -132,4 +132,10 @@ public class Sound {
         warpSound.stop();
     }
 
+    public void stopLooping(){
+        missileSound.stop();
+        saucerSound.stop();
+        thrustersSound.stop();
+    }
+
 }
