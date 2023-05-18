@@ -37,6 +37,8 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import my.asteroids.sprite.AsteroidsSprite;
+import my.asteroids.sprite.FwdThruster;
+import my.asteroids.sprite.RevThruster;
 import my.asteroids.sprite.Ship;
 import my.asteroids.Sound;
 
@@ -138,7 +140,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	// Sprite objects.
 
 	Ship ship;
-	AsteroidsSprite fwdThruster, revThruster;
+	FwdThruster fwdThruster;
+	RevThruster revThruster;
 	AsteroidsSprite ufo;
 	AsteroidsSprite missile;
 	AsteroidsSprite[] photons = new AsteroidsSprite[MAX_SHOTS];
@@ -256,27 +259,12 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			stars[i] = new Point((int) (Math.random() * AsteroidsSprite.width),
 					(int) (Math.random() * AsteroidsSprite.height));
 
-		// Create shape for the ship sprite.
+
 
 		ship = new Ship();
+		fwdThruster = new FwdThruster();
+		revThruster = new RevThruster();
 
-
-		// Create shapes for the ship thrusters.
-
-		fwdThruster = new AsteroidsSprite();
-		fwdThruster.shape.addPoint(0, 12);
-		fwdThruster.shape.addPoint(-3, 16);
-		fwdThruster.shape.addPoint(0, 26);
-		fwdThruster.shape.addPoint(3, 16);
-		revThruster = new AsteroidsSprite();
-		revThruster.shape.addPoint(-2, 12);
-		revThruster.shape.addPoint(-4, 14);
-		revThruster.shape.addPoint(-2, 20);
-		revThruster.shape.addPoint(0, 14);
-		revThruster.shape.addPoint(2, 12);
-		revThruster.shape.addPoint(4, 14);
-		revThruster.shape.addPoint(2, 20);
-		revThruster.shape.addPoint(0, 14);
 
 		// Create shape for each photon sprites.
 
@@ -468,27 +456,11 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 	public void initShip() {
 
-		// Reset the ship sprite at the center of the screen.
-
-		ship.active = true;
-		ship.angle = 0.0;
-		ship.deltaAngle = 0.0;
-		ship.x = 0.0;
-		ship.y = 0.0;
-		ship.deltaX = 0.0;
-		ship.deltaY = 0.0;
-		ship.render();
+		ship.init();
 
 		// Initialize thruster sprites.
-
-		fwdThruster.x = ship.x;
-		fwdThruster.y = ship.y;
-		fwdThruster.angle = ship.angle;
-		fwdThruster.render();
-		revThruster.x = ship.x;
-		revThruster.y = ship.y;
-		revThruster.angle = ship.angle;
-		revThruster.render();
+		fwdThruster.init(ship);
+		revThruster.init(ship);
 
 		if (loaded)
 			sound.getThrustersSound().stop();
