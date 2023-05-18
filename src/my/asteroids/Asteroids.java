@@ -21,6 +21,7 @@ import java.awt.FontMetrics;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Image;
+import javax.sound.sampled.Clip;
 import java.awt.Panel;
 import java.awt.Point;
 import java.awt.Polygon;
@@ -32,11 +33,12 @@ import java.io.InputStream;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import my.asteroids.sprite.AsteroidsSprite;
+import my.asteroids.sprite.Ship;
+import my.asteroids.Sound;
 
 public class Asteroids extends Panel implements Runnable, KeyListener {
 	private static final long serialVersionUID = 1L;
@@ -123,7 +125,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	boolean loaded = false;
 	boolean paused;
 	boolean playing;
-	boolean sound;
+	boolean doSound;
 	boolean detail;
 
 	// Key flags.
@@ -135,7 +137,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 	// Sprite objects.
 
-	AsteroidsSprite ship;
+	Ship ship;
 	AsteroidsSprite fwdThruster, revThruster;
 	AsteroidsSprite ufo;
 	AsteroidsSprite missile;
@@ -175,15 +177,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	int[] explosionCounter = new int[MAX_SCRAP]; // Time counters for explosions.
 	int explosionIndex; // Next available explosion sprite.
 
-	// Sound clips.
 
-	Clip crashSound;
-	Clip explosionSound;
-	Clip fireSound;
-	Clip missileSound;
-	Clip saucerSound;
-	Clip thrustersSound;
-	Clip warpSound;
 
 	// Flags for looping sound clips.
 
@@ -191,10 +185,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	boolean saucerPlaying;
 	boolean missilePlaying;
 
-	// Counter and total used to track the loading of the sound clips.
-
-	int clipTotal = 0;
-	int clipsLoaded = 0;
 
 	// Off screen image.
 
@@ -208,6 +198,11 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 	FontMetrics fm = getFontMetrics(font);
 	int fontWidth = fm.getMaxAdvance();
 	int fontHeight = fm.getHeight();
+
+
+	// My stuff
+
+	Sound sound = new Sound();
 
 	public String getAppletInfo() {
 
@@ -263,10 +258,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		// Create shape for the ship sprite.
 
-		ship = new AsteroidsSprite();
-		ship.shape.addPoint(0, -10);
-		ship.shape.addPoint(7, 10);
-		ship.shape.addPoint(-7, 10);
+		ship = new Ship();
+
 
 		// Create shapes for the ship thrusters.
 
@@ -333,7 +326,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		// Initialize game data and put us in 'game over' mode.
 
 		highScore = 0;
-		sound = true;
+		doSound = true;
 		detail = true;
 		initGame();
 		endGame();
@@ -406,7 +399,9 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		// Run thread for loading sounds.
 
 		if (!loaded && Thread.currentThread() == loadThread) {
-			loadSounds();
+			sound.load(()->{
+				onSoundLoaded();
+			});
 			loaded = true;
 			loadThread.stop();
 		}
@@ -459,85 +454,17 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		}
 	}
 
-	public void loadSounds() {
 
-		// Load all sound clips by playing and immediately stopping them. Update
-		// counter and total for display.
-
-		crashSound = getAudioClip("crash.wav");
-		clipTotal++;
-		explosionSound = getAudioClip("explosion.wav");
-		clipTotal++;
-		fireSound = getAudioClip("fire.wav");
-		clipTotal++;
-		missileSound = getAudioClip("missile.wav");
-		clipTotal++;
-		saucerSound = getAudioClip("saucer.wav");
-		clipTotal++;
-		thrustersSound = getAudioClip("thrusters.wav");
-		clipTotal++;
-		warpSound = getAudioClip("warp.wav");
-		clipTotal++;
-
+	public void onSoundLoaded(){
 		try {
-			crashSound.start();
-			crashSound.stop();
-			clipsLoaded++;
-			repaint();
-			Thread.currentThread().sleep(DELAY);
-			explosionSound.start();
-			explosionSound.stop();
-			clipsLoaded++;
-			repaint();
-			Thread.currentThread().sleep(DELAY);
-			fireSound.start();
-			fireSound.stop();
-			clipsLoaded++;
-			repaint();
-			Thread.currentThread().sleep(DELAY);
-			missileSound.start();
-			missileSound.stop();
-			clipsLoaded++;
-			repaint();
-			Thread.currentThread().sleep(DELAY);
-			saucerSound.start();
-			saucerSound.stop();
-			clipsLoaded++;
-			repaint();
-			Thread.currentThread().sleep(DELAY);
-			thrustersSound.start();
-			thrustersSound.stop();
-			clipsLoaded++;
-			repaint();
-			Thread.currentThread().sleep(DELAY);
-			warpSound.start();
-			warpSound.stop();
-			clipsLoaded++;
 			repaint();
 			Thread.currentThread().sleep(DELAY);
 		} catch (InterruptedException e) {
 		}
+
 	}
 
-	private Clip getAudioClip(String filename) {
-		if (filename == null)
-			throw new IllegalArgumentException();
-		// code adapted from:
-		// http://stackoverflow.com/questions/26305/how-can-i-play-sound-in-java
-		try {
-			Clip clip = AudioSystem.getClip();
-			InputStream is = Asteroids.class.getResourceAsStream(filename);
-			AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
-			clip.open(ais);
-			return clip;
-		} catch (UnsupportedAudioFileException e) {
-			throw new IllegalArgumentException("unsupported audio format: '" + filename + "'", e);
-		} catch (LineUnavailableException e) {
-			throw new IllegalArgumentException("could not play '" + filename + "'", e);
-		} catch (IOException e) {
-			throw new IllegalArgumentException("could not play '" + filename + "'", e);
-		}
-	}
+
 
 	public void initShip() {
 
@@ -564,7 +491,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		revThruster.render();
 
 		if (loaded)
-			thrustersSound.stop();
+			sound.getThrustersSound().stop();
 		thrustersPlaying = false;
 		hyperCounter = 0;
 	}
@@ -660,7 +587,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		if (shipsLeft > 0)
 			shipsLeft--;
 		if (loaded)
-			thrustersSound.stop();
+			sound.getThrustersSound().stop();
 		thrustersPlaying = false;
 	}
 
@@ -709,8 +636,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			ufo.deltaY = ufo.deltaY;
 		ufo.render();
 		saucerPlaying = true;
-		if (sound)
-			saucerSound.loop(Clip.LOOP_CONTINUOUSLY);
+		if (doSound)
+			sound.getSaucerSound().loop(Clip.LOOP_CONTINUOUSLY);
 		ufoCounter = (int) Math.abs(AsteroidsSprite.width / ufo.deltaX);
 	}
 
@@ -734,8 +661,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 				ufo.render();
 				for (i = 0; i < MAX_SHOTS; i++)
 					if (photons[i].active && ufo.isColliding(photons[i])) {
-						if (sound)
-							crashSound.loop(1);
+						if (doSound)
+							sound.getCrashSound().loop(1);
 						explode(ufo);
 						stopUfo();
 						score += UFO_POINTS;
@@ -758,7 +685,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		ufoCounter = 0;
 		ufoPassesLeft = 0;
 		if (loaded)
-			saucerSound.stop();
+			sound.getSaucerSound().stop();
 		saucerPlaying = false;
 	}
 
@@ -773,8 +700,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		missile.deltaY = 0.0;
 		missile.render();
 		missileCounter = Missile_COUNT;
-		if (sound)
-			missileSound.loop(Clip.LOOP_CONTINUOUSLY);
+		if (doSound)
+			sound.getMissileSound().loop(Clip.LOOP_CONTINUOUSLY);
 		missilePlaying = true;
 	}
 
@@ -794,15 +721,15 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 				missile.render();
 				for (i = 0; i < MAX_SHOTS; i++)
 					if (photons[i].active && missile.isColliding(photons[i])) {
-						if (sound)
-							crashSound.loop(1);
+						if (doSound)
+							sound.getCrashSound().loop(1);
 						explode(missile);
 						stopMissile();
 						score += Missile_POINTS;
 					}
 				if (missile.active && ship.active && hyperCounter <= 0 && ship.isColliding(missile)) {
-					if (sound)
-						crashSound.loop(1);
+					if (doSound)
+						sound.getCrashSound().loop(1);
 					explode(ship);
 					stopShip();
 					stopUfo();
@@ -853,7 +780,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		missile.active = false;
 		missileCounter = 0;
 		if (loaded)
-			missileSound.stop();
+			sound.getMissileSound().stop();
 		missilePlaying = false;
 	}
 
@@ -980,8 +907,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 						asteroidsLeft--;
 						asteroids[i].active = false;
 						photons[j].active = false;
-						if (sound)
-							explosionSound.loop(1);
+						if (doSound)
+							sound.getExplosionSound().loop(1);
 						explode(asteroids[i]);
 						if (!asteroidIsSmall[i]) {
 							score += BIG_POINTS;
@@ -993,8 +920,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 				// If the ship is not in hyperspace, see if it is hit.
 
 				if (ship.active && hyperCounter <= 0 && asteroids[i].active && asteroids[i].isColliding(ship)) {
-					if (sound)
-						crashSound.loop(1);
+					if (doSound)
+						sound.getCrashSound().loop(1);
 					explode(ship);
 					stopShip();
 					stopUfo();
@@ -1082,16 +1009,16 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			down = true;
 
 		if ((up || down) && ship.active && !thrustersPlaying) {
-			if (sound && !paused)
-				thrustersSound.loop(Clip.LOOP_CONTINUOUSLY);
+			if (doSound && !paused)
+				sound.getThrustersSound().loop(Clip.LOOP_CONTINUOUSLY);
 			thrustersPlaying = true;
 		}
 
 		// Spacebar: fire a photon and start its counter.
 
 		if (e.getKeyChar() == ' ' && ship.active) {
-			if (sound & !paused) {
-				fireSound.loop(1);
+			if (doSound & !paused) {
+				sound.getFireSound().loop(1);
 			}
 			photonTime = System.currentTimeMillis();
 			photonIndex++;
@@ -1115,8 +1042,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			ship.x = Math.random() * AsteroidsSprite.width;
 			ship.y = Math.random() * AsteroidsSprite.height;
 			hyperCounter = HYPER_COUNT;
-			if (sound & !paused)
-				warpSound.loop(1);
+			if (doSound & !paused)
+				sound.getWarpSound().loop(1);
 		}
 
 		// 'P' key: toggle pause mode and start or stop any active looping sound
@@ -1124,19 +1051,19 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		if (c == 'p') {
 			if (paused) {
-				if (sound && missilePlaying)
-					missileSound.loop(Clip.LOOP_CONTINUOUSLY);
-				if (sound && saucerPlaying)
-					saucerSound.loop(Clip.LOOP_CONTINUOUSLY);
-				if (sound && thrustersPlaying)
-					thrustersSound.loop(Clip.LOOP_CONTINUOUSLY);
+				if (doSound && missilePlaying)
+					sound.getMissileSound().loop(Clip.LOOP_CONTINUOUSLY);
+				if (doSound && saucerPlaying)
+					sound.getSaucerSound().loop(Clip.LOOP_CONTINUOUSLY);
+				if (doSound && thrustersPlaying)
+					sound.getThrustersSound().loop(Clip.LOOP_CONTINUOUSLY);
 			} else {
 				if (missilePlaying)
-					missileSound.stop();
+					sound.getMissileSound().stop();
 				if (saucerPlaying)
-					saucerSound.stop();
+					sound.getSaucerSound().stop();
 				if (thrustersPlaying)
-					thrustersSound.stop();
+					sound.getThrustersSound().stop();
 			}
 			paused = !paused;
 		}
@@ -1144,23 +1071,17 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		// 'M' key: toggle sound on or off and stop any looping sound clips.
 
 		if (c == 'm' && loaded) {
-			if (sound) {
-				crashSound.stop();
-				explosionSound.stop();
-				fireSound.stop();
-				missileSound.stop();
-				saucerSound.stop();
-				thrustersSound.stop();
-				warpSound.stop();
+			if (doSound) {
+				sound.stopAll();
 			} else {
 				if (missilePlaying && !paused)
-					missileSound.loop(Clip.LOOP_CONTINUOUSLY);
+					sound.getMissileSound().loop(Clip.LOOP_CONTINUOUSLY);
 				if (saucerPlaying && !paused)
-					saucerSound.loop(Clip.LOOP_CONTINUOUSLY);
+					sound.getSaucerSound().loop(Clip.LOOP_CONTINUOUSLY);
 				if (thrustersPlaying && !paused)
-					thrustersSound.loop(Clip.LOOP_CONTINUOUSLY);
+					sound.getThrustersSound().loop(Clip.LOOP_CONTINUOUSLY);
 			}
-			sound = !sound;
+			doSound = !doSound;
 		}
 
 		// 'D' key: toggle graphics detail on or off.
@@ -1189,7 +1110,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			down = false;
 
 		if (!up && !down && thrustersPlaying) {
-			thrustersSound.stop();
+			sound.getThrustersSound().stop();
 			thrustersPlaying = false;
 		}
 	}
@@ -1326,7 +1247,7 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		offGraphics.drawString("Ships: " + shipsLeft, fontWidth, d.height - fontHeight);
 		s = "High: " + highScore;
 		offGraphics.drawString(s, d.width - (fontWidth + fm.stringWidth(s)), fontHeight);
-		if (!sound) {
+		if (!doSound) {
 			s = "Mute";
 			offGraphics.drawString(s, d.width - (fontWidth + fm.stringWidth(s)), d.height - fontHeight);
 		}
@@ -1349,8 +1270,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 				offGraphics.setColor(Color.black);
 				offGraphics.fillRect(x, y, w, h);
 				offGraphics.setColor(Color.gray);
-				if (clipTotal > 0)
-					offGraphics.fillRect(x, y, (int) (w * clipsLoaded / clipTotal), h);
+				if (sound.getClipTotal() > 0)
+					offGraphics.fillRect(x, y, (int) (w * sound.getClipsLoaded() / sound.getClipTotal()), h);
 				offGraphics.setColor(Color.white);
 				offGraphics.drawRect(x, y, w, h);
 				offGraphics.drawString(s, x + 2 * fontWidth, y + fm.getMaxAscent());
