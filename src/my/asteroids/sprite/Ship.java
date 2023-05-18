@@ -8,6 +8,8 @@ import my.asteroids.Asteroids;
 public class Ship extends AsteroidsSprite{
 
 	static final double SHIP_ANGLE_STEP = Math.PI / Asteroids.FPS;
+	static final double SHIP_SPEED_STEP = 15.0 / Asteroids.FPS;
+
 
     FwdThruster fwdThruster;
 	RevThruster revThruster;
@@ -51,6 +53,18 @@ public class Ship extends AsteroidsSprite{
     }
 
 
+
+    public void runFwdThrustor(Graphics offGraphics){
+        fwdThruster.run(offGraphics);
+    }
+
+    public void runRwdThrustor(Graphics offGraphics){
+        revThruster.run(offGraphics);
+    }
+
+
+    // =========== MOVE ===========
+
     public void rotateLeft(){
         angle += SHIP_ANGLE_STEP;
         if (angle > 2 * Math.PI)
@@ -63,13 +77,19 @@ public class Ship extends AsteroidsSprite{
             angle += 2 * Math.PI;
     }
 
+    public void moveForward(){
+        double dx = SHIP_SPEED_STEP * -Math.sin(angle);
+		double dy = SHIP_SPEED_STEP * Math.cos(angle);
 
-    public void runFwdThrustor(Graphics offGraphics){
-        fwdThruster.run(offGraphics);
+        deltaX += dx;
+        deltaY += dy;
     }
+    
+    public void moveBackward(){
+        double dx = SHIP_SPEED_STEP * -Math.sin(angle);
+		double dy = SHIP_SPEED_STEP * Math.cos(angle);
 
-    public void runRwdThrustor(Graphics offGraphics){
-        revThruster.run(offGraphics);
+        deltaX -= dx;
+        deltaY -= dy;
     }
-
 }

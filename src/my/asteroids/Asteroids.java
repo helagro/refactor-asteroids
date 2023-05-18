@@ -75,7 +75,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 	// Ship's rotation and acceleration rates and maximum speed.
 
-	static final double SHIP_SPEED_STEP = 15.0 / FPS;
 	static final double MAX_SHIP_SPEED = 1.25 * MAX_ROCK_SPEED;
 
 	static final int FIRE_DELAY = 50; // Minimum number of milliseconds
@@ -465,15 +464,11 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		// Fire thrusters if up or down cursor key is down.
 
-		dx = SHIP_SPEED_STEP * -Math.sin(ship.angle);
-		dy = SHIP_SPEED_STEP * Math.cos(ship.angle);
 		if (up) {
-			ship.deltaX += dx;
-			ship.deltaY += dy;
+			ship.moveForward();
 		}
 		if (down) {
-			ship.deltaX -= dx;
-			ship.deltaY -= dy;
+			ship.moveBackward();
 		}
 
 		// Don't let ship go past the speed limit.
