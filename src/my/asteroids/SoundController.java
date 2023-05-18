@@ -6,7 +6,7 @@ import javax.sound.sampled.Clip;
 public class SoundController {
 
     // Counter and total used to track the loading of the sound clips.
-    private int CLIP_TOTAL = 7;
+    public final int CLIP_TOTAL = 7;
 
     SoundLoader soundLoader = new SoundLoader();
     private boolean isLoaded = false;
@@ -42,8 +42,6 @@ public class SoundController {
 
 
     public void load(Runnable onSoundLoaded) {
-        CLIP_TOTAL++;
-
         crashSound = soundLoader.load("crash.wav", onSoundLoaded);
         explosionSound = soundLoader.load("explosion.wav", onSoundLoaded);
         fireSound = soundLoader.load("fire.wav", onSoundLoaded);
@@ -56,12 +54,6 @@ public class SoundController {
 	}
 
 
-
-    // ============ GETTERS ===========
-
-    public int getCLIP_TOTAL() {
-        return CLIP_TOTAL;
-    }
 
     public int getClipsLoaded() {
         return soundLoader.getClipsLoaded();
