@@ -452,9 +452,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			if (hyperCounter > 0)
 				hyperCounter--;
 
-			// Update the thruster sprites to match the ship sprite.
-
-			ship.positionThrusters();
 		}
 
 		// Ship is exploding, advance the countdown or create a new ship if it is
@@ -694,11 +691,11 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 		int count = 0;
 		int i = 0;
-		double tempX = asteroids[n].x;
-		double tempY = asteroids[n].y;
+		double x = asteroids[n].x;
+		double y = asteroids[n].y;
 		do {
 			if (!asteroids[i].active) {
-				asteroids[i].shrink(tempX, tempY, asteroidsSpeed);
+				asteroids[i].shrink(x, y, asteroidsSpeed);
 
 				count++;
 				asteroidsLeft++;
@@ -843,11 +840,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			photonIndex++;
 			if (photonIndex >= MAX_SHOTS)
 				photonIndex = 0;
-			photons[photonIndex].active = true;
-			photons[photonIndex].x = ship.x;
-			photons[photonIndex].y = ship.y;
-			photons[photonIndex].deltaX = 2 * Asteroid.MAX_ROCK_SPEED * -Math.sin(ship.angle);
-			photons[photonIndex].deltaY = 2 * Asteroid.MAX_ROCK_SPEED * Math.cos(ship.angle);
+
+			photons[photonIndex].launch(ship);
 		}
 
 		// Allow upper or lower case characters for remaining keys.

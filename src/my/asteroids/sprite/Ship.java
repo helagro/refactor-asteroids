@@ -41,8 +41,15 @@ public class Ship extends AsteroidsSprite{
 		render();
     }
 
+    @Override
+    public boolean advance() {
+        positionThrusters();
+        
+        return super.advance();
+    }
 
-    public void positionThrusters(){
+
+    private void positionThrusters(){
         revThruster.position(this);
         fwdThruster.position(this);
     }
