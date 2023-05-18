@@ -711,23 +711,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		tempY = asteroids[n].y;
 		do {
 			if (!asteroids[i].active) {
-				asteroids[i].shape = new Polygon();
-				s = Asteroid.MIN_ROCK_SIDES + (int) (Math.random() * (Asteroid.MAX_ROCK_SIDES - Asteroid.MIN_ROCK_SIDES));
-				for (j = 0; j < s; j++) {
-					theta = 2 * Math.PI / s * j;
-					r = (Asteroid.MIN_ROCK_SIZE + (int) (Math.random() * (Asteroid.MAX_ROCK_SIZE - Asteroid.MIN_ROCK_SIZE))) / 2;
-					x = (int) -Math.round(r * Math.sin(theta));
-					y = (int) Math.round(r * Math.cos(theta));
-					asteroids[i].shape.addPoint(x, y);
-				}
-				asteroids[i].active = true;
-				asteroids[i].angle = 0.0;
-				asteroids[i].deltaAngle = Math.random() * 2 * Asteroid.MAX_ROCK_SPIN - Asteroid.MAX_ROCK_SPIN;
-				asteroids[i].x = tempX;
-				asteroids[i].y = tempY;
-				asteroids[i].deltaX = Math.random() * 2 * asteroidsSpeed - asteroidsSpeed;
-				asteroids[i].deltaY = Math.random() * 2 * asteroidsSpeed - asteroidsSpeed;
-				asteroids[i].render();
+				asteroids[i].shrink(tempX, tempY, asteroidsSpeed);
+
 				asteroidIsSmall[i] = true;
 				count++;
 				asteroidsLeft++;
