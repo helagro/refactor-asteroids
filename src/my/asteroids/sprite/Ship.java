@@ -21,8 +21,6 @@ public class Ship extends SpriteObj{
     private FwdThruster fwdThruster;
 	private RevThruster revThruster;
 	private int hyperCounter; // Timer counter for hyperspace. 
-    private int c;
-
 
 
     public Ship(){
@@ -82,9 +80,13 @@ public class Ship extends SpriteObj{
         return hyperCounter;
     }
 
-    public void setColor(int c){
-        this.c = c;
+    public void teleportRandom(){
+        x = Math.random() * SpriteObj.width;
+        y = Math.random() * SpriteObj.height;
     }
+
+
+    // ============ DRAW ============
 
 
     @Override
@@ -93,7 +95,10 @@ public class Ship extends SpriteObj{
             offGraphics.setColor(Color.black);
             offGraphics.fillPolygon(sprite);
         }
+
+        int c = 255 - (255 / Ship.HYPER_COUNT) * getHyperSpaceCounter();
         offGraphics.setColor(new Color(c, c, c));
+
         offGraphics.drawPolygon(sprite);
         offGraphics.drawLine(sprite.xpoints[sprite.npoints - 1],
                 sprite.ypoints[sprite.npoints - 1], sprite.xpoints[0], sprite.ypoints[0]);

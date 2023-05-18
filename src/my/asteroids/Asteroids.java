@@ -100,8 +100,8 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 	Ship ship;
 	Missile missile;
-
 	FlyingSaucer ufo;
+
 	Photon[] photons = new Photon[Photon.MAX_SHOTS];
 	Asteroid[] asteroids = new Asteroid[MAX_ROCKS];
 	Explosion[] explosions = new Explosion[MAX_SCRAP];
@@ -115,7 +115,6 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 
 	int photonIndex; // Index to next available photon sprite.
 	long photonTime; // Time value used to keep firing rate constant.
-
 
 	// Asteroid data.
 
@@ -603,16 +602,14 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 			down = true;
 
 		if ((up || down) && ship.active && !thrustersPlaying) {
-			if (!paused)
-				sound.play(sound.getThrustersSound(), Clip.LOOP_CONTINUOUSLY);
+			sound.play(sound.getThrustersSound(), Clip.LOOP_CONTINUOUSLY);
 			thrustersPlaying = true;
 		}
 
 		// Spacebar: fire a photon and start its counter.
 
-		if (e.getKeyChar() == ' ' || true && ship.active) { //TODO: rm || true
-			if (!paused)
-				sound.play(sound.getFireSound(), 1);
+		if (e.getKeyChar() == ' ' && ship.active) {
+			sound.play(sound.getFireSound(), 1);
 
 			photonTime = System.currentTimeMillis();
 			photonIndex++;
@@ -630,11 +627,10 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 		// starting counter.
 
 		if (c == 'h' && ship.active && !ship.isHyperSpace()) {
-			ship.x = Math.random() * SpriteObj.width;
-			ship.y = Math.random() * SpriteObj.height;
+			ship.teleportRandom();
 			ship.enterHyperSpace();
-			if (!paused)
-				sound.play(sound.getWarpSound(), 1);
+
+			sound.play(sound.getWarpSound(), 1);
 		}
 
 		// 'P' key: toggle pause mode and start or stop any active looping sound
@@ -731,37 +727,21 @@ public class Asteroids extends Panel implements Runnable, KeyListener {
 				offGraphics.drawLine(stars[i].x, stars[i].y, stars[i].x, stars[i].y);
 		}
 
-		// Draw photon bullets.
 
-		offGraphics.setColor(Color.white);
 		for (i = 0; i < Photon.MAX_SHOTS; i++)
 			photons[i].draw(offGraphics, detail);
-
-		// Draw the guided missile, counter is used to quickly fade color to black
-		// when near expiration.
-
-		c = Math.min(missile.getMissileCounter() * 24, 255);
-		offGraphics.setColor(new Color(c, c, c));
-
-		missile.draw(offGraphics, detail);
 
 		for (i = 0; i < MAX_ROCKS; i++)
 			asteroids[i].draw(offGraphics, detail);
 
 		ufo.draw(offGraphics, detail);
+		missile.draw(offGraphics, detail);
+		ship.draw(offGraphics, detail);
 
-			
-		// Draw the ship, counter is used to fade color to white on hyperspace.
-		c = 255 - (255 / Ship.HYPER_COUNT) * ship.getHyperSpaceCounter();
-
-		boolean canDrawThrustor = !paused && detail;
-		if(canDrawThrustor){
+		if(!paused){
 			if(up) ship.drawFwdThruster(offGraphics, detail);
 			if(down) ship.drawRevThruster(offGraphics, detail);
 		}
-
-		ship.setColor(c);
-		ship.draw(offGraphics, detail);
 
 
 		// Draw any explosion debris, counters are used to fade color to black.

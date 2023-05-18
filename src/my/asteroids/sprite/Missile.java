@@ -1,5 +1,6 @@
 package my.asteroids.sprite;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import javax.sound.sampled.Clip;
@@ -96,12 +97,13 @@ public class Missile extends SpriteObj{
 		sound.stop(sound.getMissileSound());
     }
 
-    public int getMissileCounter(){
-        return missileCounter;
-    }
 
 	@Override
 	protected void onDraw(Graphics offGraphics, boolean detailed) {
+		// Counter is used to quickly fade color to black when near expiration.
+		int c = Math.min(missileCounter * 24, 255);
+		offGraphics.setColor(new Color(c, c, c));
+
 		offGraphics.drawPolygon(sprite);
 		offGraphics.drawLine(sprite.xpoints[sprite.npoints - 1],
 		sprite.ypoints[sprite.npoints - 1], sprite.xpoints[0],

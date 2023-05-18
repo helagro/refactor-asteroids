@@ -1,5 +1,6 @@
 package my.asteroids.sprite;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 import my.asteroids.Sound;
@@ -24,6 +25,7 @@ public class Photon extends SpriteObj{
 
     @Override
     protected void onDraw(Graphics offGraphics, boolean detailed){
+		offGraphics.setColor(Color.white);
         offGraphics.drawPolygon(sprite);
     }
 
