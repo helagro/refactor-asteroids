@@ -3,7 +3,7 @@ package my.asteroids.sprite;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import my.asteroids.Sound;
+import my.asteroids.SoundController;
 
 public class Photon extends SpriteObj{
 	public static final int MAX_SHOTS = 8; // Maximum number of sprites
@@ -34,7 +34,7 @@ public class Photon extends SpriteObj{
     public static boolean handleCollision(Photon[] photons, SpriteObj target){
         if(!target.active) return false;
 
-        Sound sound = Sound.getInstance();
+        SoundController sound = SoundController.getInstance();
 
         for(Photon photon : photons){
             if(photon.active && photon.isColliding(target)){

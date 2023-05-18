@@ -6,7 +6,7 @@ import java.awt.Graphics;
 import javax.sound.sampled.Clip;
 
 import my.asteroids.Game;
-import my.asteroids.Sound;
+import my.asteroids.SoundController;
 
 public class FlyingSaucer extends SpriteObj{
 
@@ -17,7 +17,7 @@ public class FlyingSaucer extends SpriteObj{
 
 	private int ufoCounter; // Timer counter used to track each flying saucer pass.
 	private int passesLeft; // Counter for number of flying saucer passes.
-    private Sound sound = Sound.getInstance();
+    private SoundController sound = SoundController.getInstance();
 
 
     public FlyingSaucer(){

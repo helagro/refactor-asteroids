@@ -1,22 +1,14 @@
 package my.asteroids;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 
-public class Sound {
+public class SoundController {
 
     // Counter and total used to track the loading of the sound clips.
+    private int CLIP_TOTAL = 7;
 
-	private int clipTotal = 0;
-	private int clipsLoaded = 0;
+    SoundLoader soundLoader = new SoundLoader();
     private boolean isLoaded = false;
     private boolean isMuted = false;
 
@@ -34,15 +26,15 @@ public class Sound {
 
     // ========= SINGLETON =========
 
-    private static Sound instance;
+    private static SoundController instance;
 
-    public static Sound getInstance(){
+    public static SoundController getInstance(){
         if(instance == null) 
-            instance = new Sound();
+            instance = new SoundController();
         return instance;
     }
 
-    private Sound(){
+    private SoundController(){
     }
 
 
@@ -50,60 +42,29 @@ public class Sound {
 
 
     public void load(Runnable onSoundLoaded) {
-        crashSound = loadSound("crash.wav", onSoundLoaded);
-        explosionSound = loadSound("explosion.wav", onSoundLoaded);
-        fireSound = loadSound("fire.wav", onSoundLoaded);
-        missileSound = loadSound("missile.wav", onSoundLoaded);
-        saucerSound = loadSound("saucer.wav", onSoundLoaded);
-        thrustersSound = loadSound("thrusters.wav", onSoundLoaded);
-        warpSound = loadSound("warp.wav", onSoundLoaded);
+        CLIP_TOTAL++;
+
+        crashSound = soundLoader.load("crash.wav", onSoundLoaded);
+        explosionSound = soundLoader.load("explosion.wav", onSoundLoaded);
+        fireSound = soundLoader.load("fire.wav", onSoundLoaded);
+        missileSound = soundLoader.load("missile.wav", onSoundLoaded);
+        saucerSound = soundLoader.load("saucer.wav", onSoundLoaded);
+        thrustersSound = soundLoader.load("thrusters.wav", onSoundLoaded);
+        warpSound = soundLoader.load("warp.wav", onSoundLoaded);
 
         isLoaded = true;
-	}
-
-    private Clip loadSound(String fileName, Runnable onSoundLoaded){
-        Clip clip = getAudioClip(fileName);
-        clipTotal++;
-
-        clip.start();
-        clip.stop();
-
-        clipsLoaded++;
-        onSoundLoaded.run();
-        
-        return clip;
-    }
-
-    private Clip getAudioClip(String filename) {
-		if (filename == null)
-			throw new IllegalArgumentException();
-		// code adapted from:
-		// http://stackoverflow.com/questions/26305/how-can-i-play-sound-in-java
-		try {
-			Clip clip = AudioSystem.getClip();
-			InputStream is = Game.class.getResourceAsStream("sound/" + filename);
-			AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
-			clip.open(ais);
-			return clip;
-		} catch (UnsupportedAudioFileException e) {
-			throw new IllegalArgumentException("unsupported audio format: '" + filename + "'", e);
-		} catch (LineUnavailableException e) {
-			throw new IllegalArgumentException("could not play '" + filename + "'", e);
-		} catch (IOException e) {
-			throw new IllegalArgumentException("could not play '" + filename + "'", e);
-		}
 	}
 
 
 
     // ============ GETTERS ===========
 
-    public int getClipTotal() {
-        return clipTotal;
+    public int getCLIP_TOTAL() {
+        return CLIP_TOTAL;
     }
 
     public int getClipsLoaded() {
-        return clipsLoaded;
+        return soundLoader.getClipsLoaded();
     }
 
     public boolean isLoaded(){

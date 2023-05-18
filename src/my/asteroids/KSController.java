@@ -39,7 +39,6 @@ public class KSController {
         this.down = down;
     }
 
-
     public boolean hasVertical(){
         return up || down;
     }

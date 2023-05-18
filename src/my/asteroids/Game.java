@@ -141,7 +141,7 @@ public class Game extends Panel implements Runnable, KSCListener{
 
 	// My stuff
 
-	Sound sound = Sound.getInstance();
+	SoundController sound = SoundController.getInstance();
 	KSController kController;
 
 
@@ -712,8 +712,8 @@ public class Game extends Panel implements Runnable, KSCListener{
 				offGraphics.setColor(Color.black);
 				offGraphics.fillRect(x, y, w, h);
 				offGraphics.setColor(Color.gray);
-				if (sound.getClipTotal() > 0)
-					offGraphics.fillRect(x, y, (int) (w * sound.getClipsLoaded() / sound.getClipTotal()), h);
+				if (sound.getCLIP_TOTAL() > 0)
+					offGraphics.fillRect(x, y, (int) (w * sound.getClipsLoaded() / sound.getCLIP_TOTAL()), h);
 				offGraphics.setColor(Color.white);
 				offGraphics.drawRect(x, y, w, h);
 				offGraphics.drawString(s, x + 2 * fontWidth, y + fm.getMaxAscent());
