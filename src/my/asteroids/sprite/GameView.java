@@ -11,6 +11,8 @@ import java.awt.Panel;
 import java.awt.Point;
 
 import my.asteroids.GameController;
+import my.asteroids.GameLogic;
+
 
 public class GameView extends Panel{
 
@@ -58,10 +60,11 @@ public class GameView extends Panel{
 
     public void init(){
         Dimension d = new Dimension(700, 400);
-		int i;
 
 		// Display copyright information.
 		System.out.println(copyText);
+
+        initStars();
 
 		// Set up key event handling and set focus to applet window.
 		requestFocus();
@@ -130,9 +133,9 @@ public class GameView extends Panel{
 		gc.getMissile().draw(offGraphics, gc.isDetail());
 		gc.getShip().draw(offGraphics, gc.isDetail());
 
-		if(!paused){
-			if(kController.isUp()) gc.getShip().drawFwdThruster(offGraphics, gc.isDetail());
-			if(kController.isDown()) gc.getShip().drawRevThruster(offGraphics, gc.isDetail());
+		if(!gc.isPaused()){
+			if(gc.isThrustFwd()) gc.getShip().drawFwdThruster(offGraphics, gc.isDetail());
+			if(gc.isThrustRev()) gc.getShip().drawRevThruster(offGraphics, gc.isDetail());
 		}
 
 
@@ -140,7 +143,7 @@ public class GameView extends Panel{
 
 		for (i = 0; i < Explosion.MAX_SCRAP; i++)
 			if (gc.getExplosion(i).active) {
-				c = (255 / SCRAP_COUNT) * explosionCounter[i];
+				c = (255 / Explosion.SCRAP_COUNT) * gc.getExplosionCounterAt(i);
 				offGraphics.setColor(new Color(c, c, c));
 				offGraphics.drawPolygon(gc.getExplosion(i).sprite);
 			}
@@ -150,9 +153,9 @@ public class GameView extends Panel{
 		offGraphics.setFont(font);
 		offGraphics.setColor(Color.white);
 
-		offGraphics.drawString("Score: " + score, fontWidth, fontHeight);
+		offGraphics.drawString("Score: " + gc.getScore(), fontWidth, fontHeight);
 		offGraphics.drawString("Ships: " + shipsLeft, fontWidth, d.height - fontHeight);
-		s = "High: " + highScore;
+		s = "High: " + gc.getHighScore();
 		offGraphics.drawString(s, d.width - (fontWidth + fm.stringWidth(s)), fontHeight);
 		if (sound.isMuted()) {
 			s = "Mute";
@@ -188,7 +191,7 @@ public class GameView extends Panel{
 			s = "'S' to Start";
 			offGraphics.drawString(s, (d.width - fm.stringWidth(s)) / 2, d.height / 4 + fontHeight);
 			}
-		} else if (paused) {
+		} else if (gc.isPaused()) {
 			s = "Game Paused";
 			offGraphics.drawString(s, (d.width - fm.stringWidth(s)) / 2, d.height / 4);
 		}
@@ -204,9 +207,12 @@ public class GameView extends Panel{
 		int c = (gc.isDetail() || s.sprite.npoints < 6) ? 1 : 2;
 
 		for (int i = 0; i < s.sprite.npoints; i += c) {
+
+            int explosionIndex = gc.getExplosionIndex();
 			explosionIndex++;
 			if (explosionIndex >= Explosion.MAX_SCRAP)
 				explosionIndex = 0;
+            gc.setExplosionIndex(explosionIndex);
 
 			int j = i + 1;
 			if (j >= s.sprite.npoints)
@@ -214,7 +220,7 @@ public class GameView extends Panel{
 
 
 			gc.getExplosion(explosionIndex).explode(s, i, j);
-			explosionCounter[explosionIndex] = SCRAP_COUNT;
+            gc.setExplosionCounterAt(explosionIndex, Explosion.SCRAP_COUNT);
 		}
 	}
 }

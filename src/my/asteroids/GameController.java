@@ -23,6 +23,13 @@ public class GameController {
     private boolean detail;
 	private boolean paused;
 
+    private boolean thrustFwd;
+    private boolean thrustRev;
+
+    private int score;
+	private int highScore;
+
+
 
     public GameController(){
         for (int i = 0; i < Photon.MAX_SHOTS; i++)
@@ -93,5 +100,39 @@ public class GameController {
     }
     public void setExplosionIndex(int i){
         explosionIndex = i;
+    }
+    public int getExplosionIndex() {
+        return explosionIndex;
+    }
+
+    
+    public boolean isThrustFwd() {
+        return thrustFwd;
+    }
+    public void setThrustFwd(boolean thrustFwd) {
+        this.thrustFwd = thrustFwd;
+    }
+
+    public boolean isThrustRev() {
+        return thrustRev;
+    }
+    public void setThrustRev(boolean thrustRev) {
+        this.thrustRev = thrustRev;
+    }
+
+    public int getScore() {
+        return score;
+    }
+    public void setScore(int score) {
+        this.score = score;
+    }
+    public int getHighScore() {
+        return highScore;
+    }
+    public void setHighScore(int highScore) {
+        this.highScore = highScore;
+    }
+    public void incScore(int delta){
+        score += delta;
     }
 }

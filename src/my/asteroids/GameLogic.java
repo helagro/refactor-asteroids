@@ -37,7 +37,6 @@ public class GameLogic implements Runnable, KSCListener{
 	public static final int FPS = // the resulting frame rate.
 			Math.round(1000 / DELAY);
 
-	static final int SCRAP_COUNT = 2 * FPS; // Timer counter starting values
 	static final int STORM_PAUSE = 2 * FPS;
 
 	static final int BIG_POINTS = 25; // Points scored for shooting
@@ -52,8 +51,6 @@ public class GameLogic implements Runnable, KSCListener{
 
 	// Game data.
 
-	int score;
-	int highScore;
 	int newShipScore;
 	int newUfoScore;
 
@@ -102,7 +99,7 @@ public class GameLogic implements Runnable, KSCListener{
 
 	private void init() {
 		// Initialize game data and put us in 'game over' mode.
-		highScore = 0;
+		gc.setHighScore(0);
 		gc.setDetail(true);
 		initGame();
 		endGame();
@@ -113,8 +110,7 @@ public class GameLogic implements Runnable, KSCListener{
 	public void initGame() {
 
 		// Initialize game data and sprites.
-
-		score = 0;
+		gc.setScore(0);
 		shipsLeft = Ship.MAX_SHIPS;
 		asteroidsSpeed = Asteroid.MIN_ROCK_SPEED;
 		newShipScore = NEW_SHIP_POINTS;
@@ -180,7 +176,7 @@ public class GameLogic implements Runnable, KSCListener{
 		// This is the main loop.
 
 		while (Thread.currentThread() == loopThread) {
-			if (!paused) {
+			if (!gc.isPaused()) {
 
 				// Move and process all sprites.
 
@@ -194,13 +190,13 @@ public class GameLogic implements Runnable, KSCListener{
 				// Check the score and advance high score, add a new ship or start the
 				// flying saucer as necessary.
 
-				if (score > highScore)
-					highScore = score;
-				if (score > newShipScore) {
+				if (gc.getScore() > gc.getHighScore())
+					gc.setHighScore(gc.getScore());
+				if (gc.getScore() > newShipScore) {
 					newShipScore += NEW_SHIP_POINTS;
 					shipsLeft++;
 				}
-				if (playing && score > newUfoScore && !gc.getUfo().active) {
+				if (playing && gc.getScore() > newUfoScore && !gc.getUfo().active) {
 					newUfoScore += FlyingSaucer.NEW_UFO_POINTS;
 					gc.getUfo().init();
 				}
@@ -272,7 +268,7 @@ public class GameLogic implements Runnable, KSCListener{
 
 	public void stopShip() {
 		gc.getShip().active = false;
-		shipCounter = SCRAP_COUNT;
+		shipCounter = Explosion.SCRAP_COUNT;
 		if (shipsLeft > 0)
 			shipsLeft--;
 		sound.stop(sound.getThrustersSound());
@@ -293,7 +289,7 @@ public class GameLogic implements Runnable, KSCListener{
 		if(collided){
 			gameView.explode(gc.getUfo());
 			gc.getUfo().stop();
-			score += FlyingSaucer.POINTS;
+			gc.incScore(FlyingSaucer.POINTS);
 		}
 
 		if (gc.getUfo().active)
@@ -323,7 +319,7 @@ public class GameLogic implements Runnable, KSCListener{
 				sound.play(sound.getCrashSound(), 1);
 				gameView.explode(gc.getMissile());
 				gc.getMissile().stop();
-				score += Missile_POINTS;
+				gc.incScore(Missile_POINTS);
 			}
 	}
 
@@ -379,10 +375,10 @@ public class GameLogic implements Runnable, KSCListener{
 					gameView.explode(gc.getAsteroid(i));
 
 					if (!gc.getAsteroid(i).isSmall()) {
-						score += BIG_POINTS;
+						gc.incScore(BIG_POINTS);
 						initSmallAsteroids(i);
 					} else {
-						score += SMALL_POINTS;
+						gc.incScore(SMALL_POINTS);
 					}
 				}
 
@@ -438,6 +434,9 @@ public class GameLogic implements Runnable, KSCListener{
 			sound.play(sound.getThrustersSound(), Clip.LOOP_CONTINUOUSLY);
 			thrustersPlaying = true;
 		}
+
+		if(kController.isUp()) gc.setThrustFwd(true);
+		if(kController.isDown()) gc.setThrustRev(true);
 	}
 
 
@@ -447,6 +446,9 @@ public class GameLogic implements Runnable, KSCListener{
 			sound.getThrustersSound().stop();
 			thrustersPlaying = false;
 		}
+
+		if(kController.isUp()) gc.setThrustFwd(false);
+		if(kController.isDown()) gc.setThrustRev(false);
 	}
 
 
@@ -472,7 +474,7 @@ public class GameLogic implements Runnable, KSCListener{
 			case 'p': //Pause
 				sound.toggleMute(false);
 				if(!sound.isMuted()) resumeLooping();
-				paused = !paused;
+				gc.setPaused(!gc.isPaused());
 				break;
 			case 'm': //Mute
 				sound.toggleMute(true);

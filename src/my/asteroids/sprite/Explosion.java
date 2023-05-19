@@ -3,8 +3,11 @@ package my.asteroids.sprite;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
+import my.asteroids.GameLogic;
+
 public class Explosion extends SpriteObj{
 
+	public static final int SCRAP_COUNT = 2 * GameLogic.FPS; // Timer counter starting values
 	public static final int MAX_SCRAP = 40;
 
 
