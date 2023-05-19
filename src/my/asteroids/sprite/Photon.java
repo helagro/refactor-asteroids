@@ -37,7 +37,7 @@ public class Photon extends SpriteObj{
         SoundController sound = SoundController.getInstance();
 
         for(Photon photon : photons){
-            if(photon.active && photon.isColliding(target)){
+            if(photon.active && target.isColliding(photon)){
                 photon.active = false;
                 target.active = false;
                 sound.play(sound.getCrashSound(), 1);

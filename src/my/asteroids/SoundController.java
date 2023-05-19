@@ -8,7 +8,7 @@ public class SoundController {
     // Counter and total used to track the loading of the sound clips.
     public final int CLIP_TOTAL = 7;
 
-    SoundLoader soundLoader = new SoundLoader();
+    private SoundLoader soundLoader = new SoundLoader();
     private boolean isLoaded = false;
     private boolean isMuted = false;
 

@@ -11,9 +11,9 @@ import my.asteroids.sprite.thruster.RevThruster;
 public class Ship extends SpriteObj{
 
 	static final double SHIP_ANGLE_STEP = Math.PI / GameLogic.FPS;
-	static final double SHIP_SPEED_STEP = 30.0 / GameLogic.FPS; //TODO: 15
+	static final double SHIP_SPEED_STEP = 15.0 / GameLogic.FPS;
 	static final double MAX_SHIP_SPEED = 1.25 * Asteroid.MAX_ROCK_SPEED;
-    static final int FIRE_DELAY = 1; // Minimum number of milliseconds required between photon shots TODO: 50
+    static final int FIRE_DELAY = 50; // Minimum number of milliseconds required between photon shots
 	public static final int HYPER_COUNT = 3 * GameLogic.FPS; // calculated using number of
 	public static final int MAX_SHIPS = 3; // Starting number of ships for each game.
 

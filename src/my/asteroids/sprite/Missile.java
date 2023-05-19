@@ -50,9 +50,9 @@ public class Missile extends SpriteObj{
     }
 
 
-    public void guide(Ship ship, boolean notHyper) {
+    public void follow(Ship ship) {
 		double dx, dy, angle;
-		if (!ship.active || !notHyper)
+		if (!ship.active || ship.isHyperSpace())
 			return;
 
 		// Find the angle needed to hit the ship.

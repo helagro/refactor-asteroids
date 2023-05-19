@@ -10,13 +10,13 @@ import java.awt.Polygon;
 
 public abstract class SpriteObj {
 
-	public Polygon shape; // Base sprite shape, centered at the origin (0,0).
+	protected Polygon shape; // Base sprite shape, centered at the origin (0,0).
 	public boolean active; // Active flag.
 	public double angle; // Current angle of rotation.
 	public double deltaAngle; // Amount to change the rotation angle.
 	public double x, y; // Current position on screen.
 	public double deltaX, deltaY; // Amount to change the screen position.
-	public Polygon sprite; // Final location and shape of sprite after
+	protected Polygon sprite; // Final location and shape of sprite after
 					// applying rotation and translation to get screen
 					// position. Used for drawing on the screen and in
 					// detecting collisions.

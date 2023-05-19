@@ -276,10 +276,7 @@ public class GameLogic implements Runnable, KSCListener{
 		if(!gc.getMissile().active) return;
 
 		gc.getMissile().update();
-		
-		boolean notHyper = !gc.getShip().isHyperSpace();
-
-		gc.getMissile().guide(gc.getShip(), notHyper);
+		gc.getMissile().follow(gc.getShip());
 
 		if(gc.getMissile().collidedWith(gc.getShip())){
 			sound.play(sound.getCrashSound(), 1);
@@ -289,13 +286,13 @@ public class GameLogic implements Runnable, KSCListener{
 			gc.getMissile().stop();
 		}
 
-		for (int i = 0; i < Photon.MAX_SHOTS; i++)
-			if (gc.getPhoton(i).active && gc.getMissile().isColliding(gc.getPhoton(i))) {
-				sound.play(sound.getCrashSound(), 1);
-				gc.explode(gc.getMissile());
-				gc.getMissile().stop();
-				gc.incScore(Missile_POINTS);
-			}
+		boolean collided = Photon.handleCollision(gc.getPhotons(), gc.getMissile());
+		if(collided){
+			gc.explode(gc.getMissile());
+			gc.getMissile().stop();
+			gc.incScore(Missile_POINTS);
+
+		}
 	}
 
 
@@ -360,14 +357,14 @@ public class GameLogic implements Runnable, KSCListener{
 
 				// If the ship is not in hyperspace, see if it is hit.
 
-				// if (gcects.getShip().active && hyperCounter <= 0 && gc.getAsteroid(i).active && gc.getAsteroid(i).isColliding(ship)) {
-				// 	if (doSound)
-				// 		sound.getCrashSound().loop(1);
-				// 	gameView.explode(ship);
-				// 	stopShip();
-				// 	ufo.stop();
-				// 	stopMissile();
-				// }
+				Ship ship = gc.getShip();
+				if (ship.active && !ship.isHyperSpace() && gc.getAsteroid(i).active && gc.getAsteroid(i).isColliding(ship)) {
+					sound.play(sound.getCrashSound(), 1);
+					gc.explode(ship);
+					stopShip();
+					gc.getUfo().stop();
+					gc.getMissile().stop();
+				}
 			}
 		}
 	}
@@ -422,8 +419,8 @@ public class GameLogic implements Runnable, KSCListener{
 			thrustersPlaying = false;
 		}
 
-		if(kController.isUp()) gc.setThrustFwd(false);
-		if(kController.isDown()) gc.setThrustRev(false);
+		if(!kController.isUp()) gc.setThrustFwd(false);
+		if(!kController.isDown()) gc.setThrustRev(false);
 	}
 
 

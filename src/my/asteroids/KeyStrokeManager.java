@@ -3,7 +3,7 @@ package my.asteroids;
 import java.awt.event.KeyEvent;
 
 public class KeyStrokeManager implements java.awt.event.KeyListener{
-    KSController kController;
+    private KSController kController;
 
     public KeyStrokeManager(KSController kController){
         this.kController = kController;

@@ -10,7 +10,7 @@ import my.asteroids.SoundController;
 
 public class FlyingSaucer extends SpriteObj{
 
-	public static final int NEW_UFO_POINTS = 600; //TODO : 2570
+	public static final int NEW_UFO_POINTS = 2570;
 	public static final int POINTS = 250;
     static final int PASSES = 3; // Number of passes for flying saucer per appearance.
 	static final double Missile_PROBABILITY = 0.45 / GameLogic.FPS;
