@@ -22,6 +22,7 @@ public class GameController {
 
     private boolean detail;
 	private boolean paused;
+	private boolean playing;
 
     private boolean thrustFwd;
     private boolean thrustRev;
@@ -29,6 +30,7 @@ public class GameController {
     private int score;
 	private int highScore;
 
+	private int shipsLeft; // Number of ships left in game, including current one.
 
 
     public GameController(){
@@ -92,6 +94,14 @@ public class GameController {
         return paused;
     }
 
+    public boolean isPlaying() {
+        return playing;
+    }
+    public void setPlaying(boolean playing) {
+        this.playing = playing;
+    }
+    
+
     public int getExplosionCounterAt(int i){
         return explosionCounter[i];
     }
@@ -134,5 +144,12 @@ public class GameController {
     }
     public void incScore(int delta){
         score += delta;
+    }
+
+    public int getShipsLeft() {
+        return shipsLeft;
+    }
+    public void setShipsLeft(int shipsLeft) {
+        this.shipsLeft = shipsLeft;
     }
 }

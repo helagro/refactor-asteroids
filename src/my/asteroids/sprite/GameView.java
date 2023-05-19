@@ -10,6 +10,7 @@ import java.awt.Image;
 import java.awt.Panel;
 import java.awt.Point;
 
+import my.asteroids.SoundController;
 import my.asteroids.GameController;
 import my.asteroids.GameLogic;
 
@@ -38,10 +39,12 @@ public class GameView extends Panel{
 	private Point[] stars;
 
     private GameController gc;
+    private SoundController sound;
 
 
-    public GameView(GameController gameObjects){
+    public GameView(GameController gameObjects, SoundController sound){
         this.gc = gameObjects;
+        this.sound = sound;
 
         Frame f = new Frame();
 		f.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -154,7 +157,7 @@ public class GameView extends Panel{
 		offGraphics.setColor(Color.white);
 
 		offGraphics.drawString("Score: " + gc.getScore(), fontWidth, fontHeight);
-		offGraphics.drawString("Ships: " + shipsLeft, fontWidth, d.height - fontHeight);
+		offGraphics.drawString("Ships: " + gc.getShipsLeft(), fontWidth, d.height - fontHeight);
 		s = "High: " + gc.getHighScore();
 		offGraphics.drawString(s, d.width - (fontWidth + fm.stringWidth(s)), fontHeight);
 		if (sound.isMuted()) {
@@ -162,7 +165,7 @@ public class GameView extends Panel{
 			offGraphics.drawString(s, d.width - (fontWidth + fm.stringWidth(s)), d.height - fontHeight);
 		}
 
-		if (!playing) {
+		if (!gc.isPlaying()) {
 			s = copyName;
 			offGraphics.drawString(s, (d.width - fm.stringWidth(s)) / 2, d.height / 2 - 2 * fontHeight);
 			s = copyVers;

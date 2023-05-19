@@ -54,13 +54,8 @@ public class GameLogic implements Runnable, KSCListener{
 	int newShipScore;
 	int newUfoScore;
 
-	// Flags for game state and options.
-
-	boolean playing;
-
 	// Ship data.
 
-	int shipsLeft; // Number of ships left in game, including current one.
 	int shipCounter; // Timer counter for ship explosion.
 
 	// Photon data.
@@ -76,23 +71,22 @@ public class GameLogic implements Runnable, KSCListener{
 
 
 	// Flags for looping sound clips.
-
 	boolean thrustersPlaying;
 
 
 	// My stuff
-
-	SoundController sound = SoundController.getInstance();
+	SoundController sound;
 	KSController kController;
 
 	GameView gameView;
 	GameController gc;
 
 
-	public GameLogic(KSController kController, GameController gcects, GameView gameView){
+	public GameLogic(KSController kController, GameController gcects, GameView gameView, SoundController sound){
 		this.kController = kController;
 		this.gc = gcects;
 		this.gameView = gameView;
+		this.sound = sound;
 
 		init();
 	}
@@ -111,7 +105,7 @@ public class GameLogic implements Runnable, KSCListener{
 
 		// Initialize game data and sprites.
 		gc.setScore(0);
-		shipsLeft = Ship.MAX_SHIPS;
+		gc.setShipsLeft(Ship.MAX_SHIPS);
 		asteroidsSpeed = Asteroid.MIN_ROCK_SPEED;
 		newShipScore = NEW_SHIP_POINTS;
 		newUfoScore = FlyingSaucer.NEW_UFO_POINTS;
@@ -123,7 +117,7 @@ public class GameLogic implements Runnable, KSCListener{
 
 		initAsteroids();
 		initExplosions();
-		playing = true;
+		gc.setPlaying(true);
 		gc.setPaused(false);
 		photonTime = System.currentTimeMillis();
 	}
@@ -131,7 +125,7 @@ public class GameLogic implements Runnable, KSCListener{
 	public void endGame() {
 		// Stop ship, flying saucer, guided missile and associated sounds.
 
-		playing = false;
+		gc.setPlaying(false);
 		stopShip();
 		gc.getUfo().stop();
 		gc.getMissile().stop();
@@ -194,9 +188,9 @@ public class GameLogic implements Runnable, KSCListener{
 					gc.setHighScore(gc.getScore());
 				if (gc.getScore() > newShipScore) {
 					newShipScore += NEW_SHIP_POINTS;
-					shipsLeft++;
+					gc.setShipsLeft(gc.getShipsLeft() +1);
 				}
-				if (playing && gc.getScore() > newUfoScore && !gc.getUfo().active) {
+				if (gc.isPlaying() && gc.getScore() > newUfoScore && !gc.getUfo().active) {
 					newUfoScore += FlyingSaucer.NEW_UFO_POINTS;
 					gc.getUfo().init();
 				}
@@ -238,7 +232,7 @@ public class GameLogic implements Runnable, KSCListener{
 	}
 
 	public void updateShip() {
-		if (!playing)
+		if (!gc.isPlaying())
 			return;
 
 		if (kController.isLeft()) gc.getShip().rotateLeft();
@@ -260,7 +254,7 @@ public class GameLogic implements Runnable, KSCListener{
 		// danger.) If that was the last ship, end the game.
 
 		else if (--shipCounter <= 0)
-			if (shipsLeft > 0) {
+			if (gc.getShipsLeft() > 0) {
 				initShip(false);
 			} else
 				endGame();
@@ -269,8 +263,8 @@ public class GameLogic implements Runnable, KSCListener{
 	public void stopShip() {
 		gc.getShip().active = false;
 		shipCounter = Explosion.SCRAP_COUNT;
-		if (shipsLeft > 0)
-			shipsLeft--;
+		if (gc.getShipsLeft() > 0)
+			gc.setShipsLeft(gc.getShipsLeft() -1);
 		sound.stop(sound.getThrustersSound());
 		thrustersPlaying = false;
 	}
@@ -484,7 +478,7 @@ public class GameLogic implements Runnable, KSCListener{
 				gc.toggleDetail();
 				break;
 			case 's': // Start
-				if(sound.isLoaded() && !playing) initGame();
+				if(sound.isLoaded() && !gc.isPlaying()) initGame();
 				break;
 		}
 	}

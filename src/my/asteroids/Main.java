@@ -2,15 +2,16 @@ package my.asteroids;
 
 import my.asteroids.sprite.GameView;
 
+
 public class Main {
     public static void main(String[] args) {
         KSController kController = new KSController();
         KeyStrokeManager keyStrokeManager = new KeyStrokeManager(kController);
+        GameController gc = new GameController();
+	    SoundController sound = SoundController.getInstance();
 
-        GameController gameObjects = new GameController();
-
-        GameView gameView = new GameView(gameObjects);
-        GameLogic gameLogic = new GameLogic(kController, gameObjects, gameView);
+        GameView gameView = new GameView(gc, sound);
+        GameLogic gameLogic = new GameLogic(kController, gc, gameView, sound);
 
         kController.addListener(gameLogic);
         gameView.addKeyListener(keyStrokeManager);
