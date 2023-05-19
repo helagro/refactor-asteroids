@@ -5,12 +5,12 @@ import java.awt.Graphics;
 
 import javax.sound.sampled.Clip;
 
-import my.asteroids.Game;
+import my.asteroids.GameLogic;
 import my.asteroids.SoundController;
 
 public class Missile extends SpriteObj{
 
-	static final int Missile_COUNT = 4 * Game.FPS; // seconds x frames per second.
+	static final int Missile_COUNT = 4 * GameLogic.FPS; // seconds x frames per second.
 	private int missileCounter; // Counter for life of 
 	private SoundController sound = SoundController.getInstance();
 

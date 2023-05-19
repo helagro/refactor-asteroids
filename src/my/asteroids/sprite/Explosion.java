@@ -4,6 +4,10 @@ import java.awt.Graphics;
 import java.awt.Polygon;
 
 public class Explosion extends SpriteObj{
+
+	public static final int MAX_SCRAP = 40;
+
+
     public void init(){
         shape = new Polygon();
         active = false;

@@ -39,7 +39,7 @@ public class SoundLoader {
 		// http://stackoverflow.com/questions/26305/how-can-i-play-sound-in-java
 		try {
 			Clip clip = AudioSystem.getClip();
-			InputStream is = Game.class.getResourceAsStream("sound/" + filename);
+			InputStream is = GameLogic.class.getResourceAsStream(FOLDER + filename);
 			AudioInputStream ais = AudioSystem.getAudioInputStream(new BufferedInputStream(is));
 			clip.open(ais);
 			return clip;
