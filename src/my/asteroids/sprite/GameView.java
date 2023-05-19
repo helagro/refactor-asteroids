@@ -12,10 +12,12 @@ import java.awt.Point;
 
 import my.asteroids.SoundController;
 import my.asteroids.GameController;
-import my.asteroids.GameLogic;
+import my.asteroids.GCListener;
 
 
-public class GameView extends Panel{
+public class GameView extends Panel implements GCListener{
+	public static int width;
+	public static int height;
 
     // Copyright information.
 	private final String copyName = "Asteroids";
@@ -42,9 +44,11 @@ public class GameView extends Panel{
     private SoundController sound;
 
 
-    public GameView(GameController gameObjects, SoundController sound){
-        this.gc = gameObjects;
+    public GameView(GameController gc, SoundController sound){		
+        this.gc = gc;
         this.sound = sound;
+
+		gc.setListener(this);
 
         Frame f = new Frame();
 		f.addWindowListener(new java.awt.event.WindowAdapter() {
@@ -61,35 +65,25 @@ public class GameView extends Panel{
 		f.show();
     }
 
-    public void init(){
+    private void init(){
         Dimension d = new Dimension(700, 400);
+		width = d.width;
+		height = d.height;
 
 		// Display copyright information.
 		System.out.println(copyText);
 
-        initStars();
-
-		// Set up key event handling and set focus to applet window.
 		requestFocus();
-
-
-		// Save the screen size.
-		SpriteObj.width = d.width;
-		SpriteObj.height = d.height;
-
-		// Generate the starry background.
-
+        initStars();
     }
 
     private void initStars(){
-        numStars = SpriteObj.width * SpriteObj.height / 5000;
+        numStars = GameView.width * GameView.height / 5000;
 		stars = new Point[numStars];
 		for (int i = 0; i < numStars; i++)
-			stars[i] = new Point((int) (Math.random() * SpriteObj.width),
-					(int) (Math.random() * SpriteObj.height));
+			stars[i] = new Point((int) (Math.random() * GameView.width),
+					(int) (Math.random() * GameView.height));
     }
-
-
 
 
     @Override
@@ -121,8 +115,9 @@ public class GameView extends Panel{
 		offGraphics.fillRect(0, 0, d.width, d.height);
 		if (gc.isDetail()) {
 			offGraphics.setColor(Color.white);
-			for (i = 0; i < numStars; i++)
+			for (i = 0; i < numStars; i++){
 				offGraphics.drawLine(stars[i].x, stars[i].y, stars[i].x, stars[i].y);
+			}
 		}
 
 
@@ -205,6 +200,7 @@ public class GameView extends Panel{
 	}
 
 
+	@Override
     public void explode(SpriteObj s) {
 		s.render();
 		int c = (gc.isDetail() || s.sprite.npoints < 6) ? 1 : 2;

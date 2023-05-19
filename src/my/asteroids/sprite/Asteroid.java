@@ -44,15 +44,15 @@ public class Asteroid extends SpriteObj{
         // Place the asteroid at one edge of the screen.
 
         if (Math.random() < 0.5) {
-            x = -SpriteObj.width / 2;
+            x = -GameView.width / 2;
             if (Math.random() < 0.5)
-                x = SpriteObj.width / 2;
-            y = Math.random() * SpriteObj.height;
+                x = GameView.width / 2;
+            y = Math.random() * GameView.height;
         } else {
-            x = Math.random() * SpriteObj.width;
-            y = -SpriteObj.height / 2;
+            x = Math.random() * GameView.width;
+            y = -GameView.height / 2;
             if (Math.random() < 0.5)
-                y = SpriteObj.height / 2;
+                y = GameView.height / 2;
         }
 
         // Set a random motion for the asteroid.

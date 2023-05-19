@@ -45,18 +45,18 @@ public class FlyingSaucer extends SpriteObj{
 
 
     private void position(){
-		x = -SpriteObj.width / 2;
-		y = Math.random() * 2 * SpriteObj.height - SpriteObj.height;
+		x = -GameView.width / 2;
+		y = Math.random() * 2 * GameView.height - GameView.height;
 		double angle = Math.random() * Math.PI / 4 - Math.PI / 2;
 		double speed = Asteroid.MAX_ROCK_SPEED / 2 + Math.random() * (Asteroid.MAX_ROCK_SPEED / 2);
 		deltaX = speed * -Math.sin(angle);
 		deltaY = speed * Math.cos(angle);
 		if (Math.random() < 0.5) {
-			x = SpriteObj.width / 2;
+			x = GameView.width / 2;
 			deltaX = -deltaX;
 		}
 
-		ufoCounter = (int) Math.abs(SpriteObj.width / deltaX);
+		ufoCounter = (int) Math.abs(GameView.width / deltaX);
     }
 
 

@@ -40,7 +40,6 @@ public class SoundController {
 
     // ========= LOAD ==========
 
-
     public void load(Runnable onSoundLoaded) {
         crashSound = soundLoader.load("crash.wav", onSoundLoaded);
         explosionSound = soundLoader.load("explosion.wav", onSoundLoaded);

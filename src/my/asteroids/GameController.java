@@ -6,6 +6,7 @@ import my.asteroids.sprite.FlyingSaucer;
 import my.asteroids.sprite.Missile;
 import my.asteroids.sprite.Photon;
 import my.asteroids.sprite.Ship;
+import my.asteroids.sprite.SpriteObj;
 
 public class GameController {
     private Ship ship = new Ship();
@@ -31,6 +32,7 @@ public class GameController {
 	private int highScore;
 
 	private int shipsLeft; // Number of ships left in game, including current one.
+    private GCListener gcListener;
 
 
     public GameController(){
@@ -44,6 +46,22 @@ public class GameController {
             explosions[i] = new Explosion();
     }
 
+
+    public void setListener(GCListener gcListener){
+        this.gcListener = gcListener;
+    }
+
+    public void explode(SpriteObj s){
+        if(gcListener != null) gcListener.explode(s);
+    }
+
+    public void repaint(){
+        if(gcListener != null) gcListener.repaint();
+    }
+
+
+
+    // ========== GET & SET ============
 
     public Ship getShip(){
         return ship;
@@ -75,8 +93,6 @@ public class GameController {
         return asteroids[i];
     }
 
-
-
     public void setDetail(boolean detail){
         this.detail = detail;
     }
@@ -100,7 +116,7 @@ public class GameController {
     public void setPlaying(boolean playing) {
         this.playing = playing;
     }
-    
+
 
     public int getExplosionCounterAt(int i){
         return explosionCounter[i];

@@ -21,18 +21,9 @@ import my.asteroids.sprite.Explosion;
 import my.asteroids.sprite.FlyingSaucer;
 import my.asteroids.sprite.Photon;
 import my.asteroids.sprite.Ship;
-import my.asteroids.sprite.GameView;
 
 public class GameLogic implements Runnable, KSCListener{
-	private static final long serialVersionUID = 1L;
-
-	// Thread control variables.
-
-	Thread loadThread;
-	Thread loopThread;
-
 	// Constants
-
 	static final int DELAY = 20; // Milliseconds between screen and
 	public static final int FPS = // the resulting frame rate.
 			Math.round(1000 / DELAY);
@@ -45,47 +36,42 @@ public class GameLogic implements Runnable, KSCListener{
 
 	// Number of points the must be scored to earn a new ship or to cause the
 	// flying saucer to appear.
-
 	static final int NEW_SHIP_POINTS = 5000;
 
 
-	// Game data.
 
+	// Thread control variables.
+	Thread loadThread;
+	Thread loopThread;
+
+	// Game data.
 	int newShipScore;
 	int newUfoScore;
 
 	// Ship data.
-
 	int shipCounter; // Timer counter for ship explosion.
 
 	// Photon data.
-
 	int photonIndex; // Index to next available photon sprite.
 	long photonTime; // Time value used to keep firing rate constant.
 
 	// Asteroid data.
-
 	int asteroidsCounter; // Break-time counter.
 	double asteroidsSpeed; // Asteroid speed.
 	int asteroidsLeft; // Number of active asteroids.
 
-
 	// Flags for looping sound clips.
 	boolean thrustersPlaying;
-
 
 	// My stuff
 	SoundController sound;
 	KSController kController;
-
-	GameView gameView;
 	GameController gc;
 
 
-	public GameLogic(KSController kController, GameController gcects, GameView gameView, SoundController sound){
+	public GameLogic(KSController kController, GameController gc, SoundController sound){
 		this.kController = kController;
-		this.gc = gcects;
-		this.gameView = gameView;
+		this.gc = gc;
 		this.sound = sound;
 
 		init();
@@ -97,8 +83,6 @@ public class GameLogic implements Runnable, KSCListener{
 		gc.setDetail(true);
 		initGame();
 		endGame();
-
-		gameView.init();
 	}
 
 	public void initGame() {
@@ -173,7 +157,6 @@ public class GameLogic implements Runnable, KSCListener{
 			if (!gc.isPaused()) {
 
 				// Move and process all sprites.
-
 				updateShip();
 				updatePhotons();
 				updateUfo();
@@ -196,14 +179,12 @@ public class GameLogic implements Runnable, KSCListener{
 				}
 
 				// If all asteroids have been destroyed create a new batch.
-
 				if (asteroidsLeft <= 0 && --asteroidsCounter <= 0)
 					initAsteroids();
 			}
 
 			// Update the screen and set the timer for the next loop.
-
-			gameView.repaint();
+			gc.repaint();
 			try {
 				startTime += DELAY;
 				Thread.sleep(Math.max(0, startTime - System.currentTimeMillis()));
@@ -216,7 +197,7 @@ public class GameLogic implements Runnable, KSCListener{
 
 	public void onSoundLoaded(){
 		try {
-			gameView.repaint();
+			gc.repaint();
 			Thread.currentThread().sleep(DELAY);
 		} catch (InterruptedException e) {
 		}
@@ -281,7 +262,7 @@ public class GameLogic implements Runnable, KSCListener{
 
 		boolean collided = Photon.handleCollision(gc.getPhotons(), gc.getUfo());
 		if(collided){
-			gameView.explode(gc.getUfo());
+			gc.explode(gc.getUfo());
 			gc.getUfo().stop();
 			gc.incScore(FlyingSaucer.POINTS);
 		}
@@ -302,7 +283,7 @@ public class GameLogic implements Runnable, KSCListener{
 
 		if(gc.getMissile().collidedWith(gc.getShip())){
 			sound.play(sound.getCrashSound(), 1);
-			gameView.explode(gc.getShip());
+			gc.explode(gc.getShip());
 			stopShip();
 			gc.getUfo().stop();
 			gc.getMissile().stop();
@@ -311,7 +292,7 @@ public class GameLogic implements Runnable, KSCListener{
 		for (int i = 0; i < Photon.MAX_SHOTS; i++)
 			if (gc.getPhoton(i).active && gc.getMissile().isColliding(gc.getPhoton(i))) {
 				sound.play(sound.getCrashSound(), 1);
-				gameView.explode(gc.getMissile());
+				gc.explode(gc.getMissile());
 				gc.getMissile().stop();
 				gc.incScore(Missile_POINTS);
 			}
@@ -366,7 +347,7 @@ public class GameLogic implements Runnable, KSCListener{
 				boolean isColliding = Photon.handleCollision(gc.getPhotons(), gc.getAsteroid(i));
 				if(isColliding){
 					asteroidsLeft--;
-					gameView.explode(gc.getAsteroid(i));
+					gc.explode(gc.getAsteroid(i));
 
 					if (!gc.getAsteroid(i).isSmall()) {
 						gc.incScore(BIG_POINTS);

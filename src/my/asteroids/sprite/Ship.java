@@ -81,8 +81,8 @@ public class Ship extends SpriteObj{
     }
 
     public void teleportRandom(){
-        x = Math.random() * SpriteObj.width;
-        y = Math.random() * SpriteObj.height;
+        x = Math.random() * GameView.width;
+        y = Math.random() * GameView.height;
     }
 
 

@@ -10,11 +10,6 @@ import java.awt.Polygon;
 
 public abstract class SpriteObj {
 
-	// Fields:
-
-	public static int width; // Dimensions of the graphics area.
-	public static int height;
-
 	public Polygon shape; // Base sprite shape, centered at the origin (0,0).
 	public boolean active; // Active flag.
 	public double angle; // Current angle of rotation.
@@ -58,21 +53,21 @@ public abstract class SpriteObj {
 			this.angle -= 2 * Math.PI;
 		wrapped = false;
 		this.x += this.deltaX;
-		if (this.x < -width / 2) {
-			this.x += width;
+		if (this.x < -GameView.width / 2) {
+			this.x += GameView.width;
 			wrapped = true;
 		}
-		if (this.x > width / 2) {
-			this.x -= width;
+		if (this.x > GameView.width / 2) {
+			this.x -= GameView.width;
 			wrapped = true;
 		}
 		this.y -= this.deltaY;
-		if (this.y < -height / 2) {
-			this.y += height;
+		if (this.y < -GameView.height / 2) {
+			this.y += GameView.height;
 			wrapped = true;
 		}
-		if (this.y > height / 2) {
-			this.y -= height;
+		if (this.y > GameView.height / 2) {
+			this.y -= GameView.height;
 			wrapped = true;
 		}
 
@@ -91,10 +86,10 @@ public abstract class SpriteObj {
 			this.sprite.addPoint(
 					(int) Math.round(
 							this.shape.xpoints[i] * Math.cos(this.angle) + this.shape.ypoints[i] * Math.sin(this.angle))
-							+ (int) Math.round(this.x) + width / 2,
+							+ (int) Math.round(this.x) + GameView.width / 2,
 					(int) Math.round(
 							this.shape.ypoints[i] * Math.cos(this.angle) - this.shape.xpoints[i] * Math.sin(this.angle))
-							+ (int) Math.round(this.y) + height / 2);
+							+ (int) Math.round(this.y) + GameView.height / 2);
 	}
 
 	public boolean isColliding(SpriteObj s) {
