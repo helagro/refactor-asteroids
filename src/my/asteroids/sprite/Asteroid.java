@@ -101,8 +101,10 @@ public class Asteroid extends SpriteObj{
 
         offGraphics.setColor(Color.white);
         offGraphics.drawPolygon(sprite);
-        offGraphics.drawLine(sprite.xpoints[sprite.npoints - 1],
+        if(sprite.npoints > 0){
+            offGraphics.drawLine(sprite.xpoints[sprite.npoints - 1],
                 sprite.ypoints[sprite.npoints - 1], sprite.xpoints[0],
                 sprite.ypoints[0]);
+        }
     }
 }
